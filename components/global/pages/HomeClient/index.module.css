@@ -1,0 +1,22 @@
+.styleBtnLearnMore {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: bold;
+    border: 2px solid grey;
+}
+
+.styleText {
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.styleTextFooter {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.styleTextFooter:hover {
+    color: #1967D2;
+}

@@ -1,0 +1,30 @@
+.styleTextReadArticle {
+    color: #2771D5;
+    font-size: 16px;
+    font-weight:500;
+    cursor: pointer;
+
+}
+
+.styleTextReadArticle:hover {
+    text-decoration: underline;
+}
+
+.wrapLearnMore:hover {
+    text-decoration: underline;
+    text-decoration-color: #1967D2;
+}
+
+.styleBtnLearnMore {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: bold;
+    border: 2px solid grey;
+}
+
+.styleText {
+    font-size: 12px;
+    margin-top: 5px;
+}
