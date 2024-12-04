@@ -4,16 +4,12 @@ import { OverLay } from '../OverLay';
 import IconClose from '@/assets/icons/IconClose';
 import IconDrawer from '@/assets/icons/IconDrawer';
 import MenuReponsive from './components/MenuReponsive';
-import { ICategory } from '@/models/popular.category.model';
+import { ICategory } from '@/utils/interfaces';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
-interface IProps {
-  categories: ICategory[];
-}
-
-export default function Header({ categories }: IProps) {
+export default function Header({ categories }: { categories: ICategory[] }) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isShadow, setShadow] = useState(false);
   const { t } = useTranslation();

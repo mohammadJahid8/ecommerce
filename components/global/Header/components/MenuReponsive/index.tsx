@@ -1,15 +1,11 @@
 'use client';
 import { memo } from 'react';
-import { ICategory } from '@/models/popular.category.model';
+import { MenuReponsiveProps } from '@/utils/interfaces';
 import Image from 'next/image';
 import IconQuestion from '@/assets/icons/IconQuestion';
 import IconOrderMenu from '@/assets/icons/IconOrderMenu';
 
-interface IProps {
-  categories: ICategory[];
-}
-
-const MenuReponsive = (props: IProps) => {
+const MenuReponsive = (props: MenuReponsiveProps) => {
   return (
     <div className=' lg:hidden absolute left- right-0 top-10 z-20 w-full py-2 mt-2 overflow-hidden bg-white rounded-md shadow-xl dark:bg-gray-800'>
       {props?.categories?.length > 0

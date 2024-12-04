@@ -1,16 +1,11 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
-import { IPopularProduct } from '@/models/popularProduct.model';
-import IconChevronRight from '@/assets/icons/IconChevronRight';
+import { IPopularProduct } from '@/utils/interfaces';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
-interface IProps {
-  popularProduct: IPopularProduct;
-}
-
-const ProductItem = (props: IProps) => {
+const ProductItem = (props: { popularProduct: IPopularProduct }) => {
   const { popularProduct } = props;
   const { t } = useTranslation();
   return (

@@ -1,15 +1,11 @@
 'use client';
 import React, { memo } from 'react';
 import Image from 'next/image';
-import { IArticle } from '@/models/artile.model';
+import { IArticle } from '@/utils/interfaces';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 
-interface IProps {
-  article: IArticle;
-}
-
-const DisCoverWorldPixelItem = (props: IProps) => {
+const DisCoverWorldPixelItem = (props: { article: IArticle }) => {
   const { article } = props;
   const { t } = useTranslation();
 

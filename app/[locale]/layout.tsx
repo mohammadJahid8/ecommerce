@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import TopProgressBar from '@/components/global/TopProgressBar';
 import Header from '@/components/global/Header';
 import Footer from '@/components/global/Footer';
 import { getCategories } from '@/services/home/home.services';
@@ -56,7 +55,7 @@ export default async function RootLayout({
 }>) {
   const categories = await getCategories();
   //@ts-ignore
-  const { t, resources } = await initTranslations(locale, i18nNamespaces);
+  const { resources } = await initTranslations(locale, i18nNamespaces);
   return (
     <html lang={locale} className={roboto.className}>
       <body className='dark:bg-[#050505]'>
@@ -71,7 +70,6 @@ export default async function RootLayout({
             locale={locale}
             namespaces={i18nNamespaces}
           >
-            <TopProgressBar />
             <Header categories={categories} />
             {children}
             <Footer />

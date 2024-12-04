@@ -5,9 +5,7 @@ import {
   getProductPopulars,
   getPopularCategories,
 } from '@/services/home/home.services';
-import { IArticle } from '@/models/artile.model';
-
-// A new trainer for your morning run.
+import { IArticle } from '@/utils/interfaces';
 
 const articles: IArticle[] = [
   {
@@ -83,6 +81,7 @@ export default async function Home() {
 
   return (
     <MainLayout>
+      {/* @ts-ignore */}
       <HomeClient
         articles={articles}
         popularCategories={popularCategories}

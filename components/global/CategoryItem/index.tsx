@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
-import { IPopularCategory } from '@/models/popular.category.model';
+import { IPopularCategory } from '@/utils/interfaces';
 
 interface IProps {
   popularCategory: IPopularCategory;
@@ -17,7 +17,7 @@ const CategoryItem = ({ popularCategory }: IProps) => {
           className='max-w-[250px] max-h-[200px] w-full h-full object-contain'
           width={100}
           height={140}
-          alt={popularCategory.alt}
+          alt={popularCategory.alt || ''}
         />
       </div>
       <div className='mt-5'>
