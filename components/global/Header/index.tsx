@@ -67,9 +67,12 @@ export default function Header({ categories }: { categories: ICategory[] }) {
           </div>
 
           <div className='flex space-x-4 w-full justify-end'>
-            <button className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white'>
+            <Link
+              href='/signin'
+              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white'
+            >
               {t('signin')}
-            </button>
+            </Link>
             <button className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:block'>
               {t('signup')}
             </button>

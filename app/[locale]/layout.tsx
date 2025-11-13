@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header from '@/components/global/Header';
-import Footer from '@/components/global/Footer';
 import { getCategories } from '@/services/home/home.services';
 import initTranslations from '@/utils/i18n';
 import TranslationsProvider from '@/utils/translator-provider';
@@ -70,9 +68,7 @@ export default async function RootLayout({
             locale={locale}
             namespaces={i18nNamespaces}
           >
-            <Header categories={categories} />
             {children}
-            <Footer />
           </TranslationsProvider>
         </ThemeProvider>
       </body>
