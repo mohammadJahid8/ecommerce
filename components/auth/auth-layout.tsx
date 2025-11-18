@@ -1,15 +1,10 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import LanguageSelector from '@/components/global/LanguageSelector';
 
 function GoogleMark({ className }: { className?: string }) {
   return (
@@ -45,6 +40,8 @@ export default function AuthLayout({
   description,
   children,
 }: AuthLayoutProps) {
+  const { t } = useTranslation();
+
   return (
     <main className='min-h-screen flex items-center justify-center bg-white md:bg-[#f0f3f8] dark:bg-[#0e0e0e]  md:dark:bg-[#1e1f21] text-neutral-900 dark:text-neutral-100'>
       <div className='w-full mx-auto max-w-[1040px] flex flex-col gap-10 md:gap-0 justify-between'>
@@ -67,27 +64,16 @@ export default function AuthLayout({
 
         <footer className='mt-4 md:px-2 px-6'>
           <div className='flex md:flex-row flex-col md:items-center gap-10 md:gap-0 justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
-            <div className='flex items-center gap-2'>
-              <DropdownMenu>
-                <DropdownMenuTrigger className='flex items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-800 py-1 rounded transition-colors'>
-                  English (United States)
-                  <ChevronDown className='w-4 h-4' />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='start'>
-                  <DropdownMenuItem>English (United States)</DropdownMenuItem>
-                  <DropdownMenuItem>Español (España)</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <LanguageSelector />
             <nav className='flex items-center gap-6'>
               <Link href='#' className='hover:underline'>
-                Help
+                {t('footer_help')}
               </Link>
               <Link href='#' className='hover:underline'>
-                Privacy
+                {t('footer_privacy')}
               </Link>
               <Link href='#' className='hover:underline'>
-                Terms
+                {t('footer_terms')}
               </Link>
             </nav>
           </div>

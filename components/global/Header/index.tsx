@@ -59,7 +59,7 @@ export default function Header({ categories }: { categories: ICategory[] }) {
           <div className=''>
             <ul className='flex'>
               <li className='cursor-pointer border-2 flex justify-center items-center rounded-full w-10 h-10 dark:border-gray-500'>
-                <Link href='/'>
+                <Link href='/profile'>
                   <span className='block transition dark:text-white'>E</span>
                 </Link>
               </li>
@@ -73,9 +73,12 @@ export default function Header({ categories }: { categories: ICategory[] }) {
             >
               {t('signin')}
             </Link>
-            <button className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:block'>
+            <Link
+              href='/signup'
+              className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:block'
+            >
               {t('signup')}
-            </button>
+            </Link>
             <ThemeToggle />
           </div>
         </div>
