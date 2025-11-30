@@ -49,7 +49,7 @@ export default function AuthLayout({
           <CardContent className='p-6 sm:p-8 md:p-10'>
             <GoogleMark className='w-12 h-12' />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-start mt-6'>
-              <div className='space-y-5 max-w-[280px]'>
+              <div className='space-y-5 max-w-[380px]'>
                 <h1 className='text-3xl md:text-[40px] font-medium tracking-tight leading-[1.2]'>
                   {title}
                 </h1>

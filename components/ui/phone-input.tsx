@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CheckIcon, ChevronsUpDown } from 'lucide-react';
+import { CheckIcon, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import * as RPNInput from 'react-phone-number-input';
 import flags from 'react-phone-number-input/flags';
 
@@ -72,7 +72,7 @@ const InputComponent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <Input
     className={cn(
-      'rounded-e-lg rounded-s-none h-[54px] md:text-base dark:bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0',
+      'rounded-lg h-[54px] md:text-base dark:bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0',
       className
     )}
     {...props}
@@ -102,16 +102,16 @@ const CountrySelect = ({
         <Button
           type='button'
           variant='outline'
-          className='flex gap-1 rounded-e-none rounded-s-lg border-input border-r-0 px-3 focus:z-10 h-[54px] dark:bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'
+          className='flex gap-1 rounded-e-none rounded-lg border-none px-3 mr-2 focus:z-10 h-[54px] dark:bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] focus:ring-0'
           disabled={disabled}
         >
           <FlagComponent
             country={selectedCountry}
             countryName={selectedCountry}
           />
-          <ChevronsUpDown
+          <ChevronDown
             className={cn(
-              '-mr-2 size-4 opacity-50',
+              'ml-2 size-4 opacity-50',
               disabled ? 'hidden' : 'opacity-100'
             )}
           />

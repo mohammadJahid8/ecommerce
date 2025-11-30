@@ -142,17 +142,35 @@
   "auth_first_surname": "Primer apellido (Opcional)",
   
   "auth_get_verification_code": "Obtener un código de verificación",
-  "auth_verification_description": "Para proteger tu cuenta, te pediremos que completes un paso de verificación para asegurar que realmente eres la persona que intenta acceder",
+  "auth_verification_description": "Vacio",
   "auth_code_sent_to": "Se enviará un código de verificación a",
   "auth_get": "Obtener",
   
-  "auth_enter_code": "Introduce el código",
-  "auth_code_was_sent": "Se envió un código de verificación a",
+  "auth_enter_code": "Confirmar el código que recibiste",
+  "auth_code_was_sent": "Ingrese el código de 6 dígitos que fue enviado a su número de teléfono",
   "auth_enter_code_placeholder": "Introduce el código",
   
   "auth_prove_not_robot": "Demuestra que no eres un robot",
-  "auth_receive_verification": "Recibe un código de verificación en tu teléfono",
+  "auth_receive_verification": "Recibirás un código de verificación en tu teléfono",
   "auth_phone_placeholder": "Número de teléfono",
-  "auth_sms_charges": "Google verificará este número por SMS (pueden aplicarse cargos)."
+  "auth_sms_charges": "Nos validaremos tu número por SMS (pueden aplicarse cargos)", 
+  "why_we_ask": "¿Por qué preguntamos por tu fecha de nacimiento y género?",
+  "auth_how_youll_sign_in": "Cómo iniciarás sesión",
+  "auth_create_gmail_address": "Crea una dirección de correo electrónico para iniciar sesión en tu cuenta",
+  "auth_username_placeholder": "Nombre de usuario",
+  "auth_username_suffix": "@gmail.com",
+  "auth_username_hint": "Puedes usar letras, números y puntos",
+  "auth_by_continuing": "Al continuar, confirmas que has leído y aceptas nuestros Términos de Servicio y Política de Privacidad.",
+  "verify_phone_description": "Para continuar, primero introduce tu ubicación y nacionalidad.",
+  "get_new_code": "Generar nuevo código (60 segundos)",
+  "auth_resend_code_timer": "Generar nuevo código ({{seconds}} segundos)",
+  "auth_resend_code_link": "Obtener nuevo código",
+  "auth_review_account_title": "Revisa la información de tu cuenta",
+  "auth_review_account_subtitle": "Puedes usar esta información para acceder",
+  "auth_recovery_phone": "Número de teléfono de recuperación",
+  "auth_loading": "Cargando...",
+  "auth_network_error": "Error de red. Por favor, inténtelo de nuevo.",
+  "auth_generic_error": "Algo salió mal. Por favor, inténtelo de nuevo.",
+  "auth_code_invalid": "El código debe tener 6 dígitos",
+  "auth_invalid_code": "Código inválido. Por favor, inténtelo de nuevo."
 }
-

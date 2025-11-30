@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
 import {
   Select,
   SelectContent,
@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import AuthLayout from '@/components/auth/auth-layout';
+import { API_BASE_URL } from '@/lib/api-config';
 
 const DobPage = () => {
   const [day, setDay] = useState('');
@@ -92,7 +93,7 @@ const DobPage = () => {
       if (dayNum > maxDays) {
         newErrors.day = t('auth_invalid_day_error', {
           month: months[monthNum - 1].label,
-          year: yearNum
+          year: yearNum,
         });
       }
 
@@ -108,11 +109,36 @@ const DobPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setApiError('');
     if (validateDate(day, month, year) && gender.trim()) {
-      // Navigate to next step in the verification process
-      router.push('/verify-identity'); // or wherever the next step should be
+      setIsLoading(true);
+      try {
+        const userId = localStorage.getItem('userId');
+        const dob = new Date(`${year}-${month}-${day}`);
+
+        // ... inside component
+        const response = await fetch(`${API_BASE_URL}/signup/dob`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, dob, gender }),
+        });
+        if (response.ok) {
+          router.push('/signup/create-email');
+        } else {
+          const data = await response.json();
+          setApiError(data.message || data.error || t('auth_generic_error'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        setApiError(t('auth_network_error'));
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -230,29 +256,39 @@ const DobPage = () => {
                 </SelectItem>
               </SelectContent>
             </Select>
+
+            <p className='text-sm md:text-base text-blue-600 dark:text-[#A8C7FA] pt-4'>
+              {t('why_we_ask')}
+            </p>
+
+            <div className='space-y-2 pt-4'>
+              {errors.day && (
+                <p className='text-red-500 text-sm'>{errors.day}</p>
+              )}
+              {errors.month && (
+                <p className='text-red-500 text-sm'>{errors.month}</p>
+              )}
+              {errors.year && (
+                <p className='text-red-500 text-sm'>{errors.year}</p>
+              )}
+              {errors.date && (
+                <p className='text-red-500 text-sm'>{errors.date}</p>
+              )}
+            </div>
           </div>
 
           {/* Error Messages Section - Always visible above button */}
-          <div className='space-y-2 pt-4'>
-            {errors.day && <p className='text-red-500 text-sm'>{errors.day}</p>}
-            {errors.month && (
-              <p className='text-red-500 text-sm'>{errors.month}</p>
-            )}
-            {errors.year && (
-              <p className='text-red-500 text-sm'>{errors.year}</p>
-            )}
-            {errors.date && (
-              <p className='text-red-500 text-sm'>{errors.date}</p>
-            )}
-          </div>
 
-          <div className='flex justify-end pt-6'>
+          <div className='flex flex-col items-end pt-6'>
+            {apiError && (
+              <p className='text-red-500 text-sm mb-2'>{apiError}</p>
+            )}
             <Button
               type='submit'
-              disabled={!isFormValid}
+              disabled={!isFormValid || isLoading}
               className='bg-blue-600 hover:bg-blue-700 text-white dark:text-black px-6 h-10 rounded-[20px] dark:bg-[#A8C7FA] disabled:opacity-50 disabled:cursor-not-allowed'
             >
-              {t('auth_next')}
+              {isLoading ? t('auth_loading') : t('auth_next')}
             </Button>
           </div>
         </form>

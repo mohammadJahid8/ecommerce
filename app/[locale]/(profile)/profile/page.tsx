@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import {
@@ -16,10 +16,36 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import LanguageSelector from '@/components/global/LanguageSelector';
 
+import { Skeleton } from '@/components/ui/skeleton';
+import { API_BASE_URL } from '@/lib/api-config';
+
 export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState('/image.png');
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          // ... inside component
+          const res = await fetch(`${API_BASE_URL}/profile/${userId}`);
+          const data = await res.json();
+          setUser(data);
+        } catch (error) {
+          console.error('Error fetching user:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -28,6 +54,56 @@ export default function ProfilePage() {
       setProfileImage(imageUrl);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
+        <div className='max-w-[850px] mx-auto space-y-4'>
+          <div className='text-center mb-8'>
+            <Skeleton className='h-8 w-48 mx-auto mb-2' />
+            <Skeleton className='h-4 w-64 mx-auto' />
+          </div>
+
+          <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f] p-6'>
+            <Skeleton className='h-6 w-32 mb-2' />
+            <Skeleton className='h-4 w-full max-w-lg mb-6' />
+            <div className='space-y-6'>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-14 w-14 rounded-full' />
+              </div>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-32' />
+              </div>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-32' />
+              </div>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-20' />
+              </div>
+            </div>
+          </div>
+
+          <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f] p-6'>
+            <Skeleton className='h-6 w-32 mb-6' />
+            <div className='space-y-6'>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-48' />
+              </div>
+              <div className='flex justify-between items-center'>
+                <Skeleton className='h-4 w-24' />
+                <Skeleton className='h-4 w-32' />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
@@ -55,9 +131,16 @@ export default function ProfilePage() {
             imageSrc={profileImage}
             onClick={() => fileInputRef.current?.click()}
           />
-          <InfoRow label={t('name')} value='John Doe' />
-          <InfoRow label={t('profile_birthday')} value='August 8, 2001' />
-          <InfoRow label={t('auth_gender')} value={t('auth_male')} isLast />
+          <InfoRow label={t('name')} value={user?.username || 'John Doe'} />
+          <InfoRow
+            label={t('profile_birthday')}
+            value={
+              user?.dob
+                ? new Date(user.dob).toLocaleDateString()
+                : 'August 8, 2001'
+            }
+          />
+          <InfoRow label={t('auth_gender')} value={user?.gender} isLast />
         </SectionCard>
 
         <input
@@ -70,8 +153,14 @@ export default function ProfilePage() {
 
         {/* Contact Info Section */}
         <SectionCard title={t('profile_contact_info')}>
-          <InfoRow label={t('profile_email')} value='example@gmail.com' />
-          <InfoRow label={t('profile_phone')} value='13434343456' />
+          <InfoRow
+            label={t('profile_email')}
+            value={user?.email || 'example@gmail.com'}
+          />
+          <InfoRow
+            label={t('profile_phone')}
+            value={user?.phoneNumber || '13434343456'}
+          />
 
           <div className='p-4 sm:p-6'>
             <div className='text-sm font-medium mb-3 text-slate-600 dark:text-slate-400'>
