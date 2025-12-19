@@ -3,26 +3,27 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/components/auth/auth-layout';
+import { API_BASE_URL } from '@/lib/api-config';
+import { useRouter } from 'next/navigation';
 
 export default function ReviewAccountPage() {
   const { t } = useTranslation();
+  const router = useRouter();
 
-  // Static data for now
   const [user, setUser] = React.useState<any>({
     name: '',
     email: '',
     phone: '',
     initial: '',
   });
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchUser = async () => {
       const userId = localStorage.getItem('userId');
       if (userId) {
         try {
-          const res = await fetch(
-            `http://localhost:5005/api/profile/${userId}`
-          );
+          const res = await fetch(`${API_BASE_URL}/profile/${userId}`);
           const data = await res.json();
           setUser({
             name: data.username,
@@ -32,16 +33,25 @@ export default function ReviewAccountPage() {
           });
         } catch (error) {
           console.error('Error fetching user:', error);
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     };
     fetchUser();
   }, []);
 
+  const handleNext = () => {
+    router.push('/profile');
+  };
+
   return (
     <AuthLayout
       title={t('auth_review_account_title')}
       description={t('auth_review_account_subtitle')}
+      isLoading={isLoading}
     >
       <div className='space-y-6'>
         <div>
@@ -71,7 +81,7 @@ export default function ReviewAccountPage() {
 
         <div className='flex justify-end pt-24'>
           <Button
-            onClick={() => (window.location.href = '/profile')}
+            onClick={handleNext}
             className='bg-blue-600 hover:bg-blue-700 text-white dark:text-black px-6 h-10 rounded-[20px] dark:bg-[#A8C7FA]'
           >
             {t('auth_next')}

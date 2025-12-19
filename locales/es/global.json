@@ -109,7 +109,7 @@
   "language_english": "English (United States)",
   "language_spanish": "Español (Latinoamérica)",
   
-  "auth_welcome": "Te damos la bienvenida",
+  "auth_welcome": "Te damos la bienvenida nuevamente",
   "auth_enter_email_phone": "Introduce tu correo electrónico o número de teléfono",
   "auth_email_or_phone_placeholder": "Correo electrónico o teléfono",
   "auth_contact_method": "¿Cuál es la mejor forma de contactarte?",
@@ -125,7 +125,7 @@
   "auth_password_mismatch": "Elige una contraseña más segura. Intenta mezclar letras, números y símbolos.",
   "auth_show_password": "Mostrar contraseña",
   
-  "auth_verify_identity": "Debes verificar que eres tú para continuar",
+  "auth_verify_identity": "Para continuar, primero verifica que eres tú",
   "auth_enter_password": "Introduce tu contraseña",
   "auth_forgot_password": "¿Olvidaste la contraseña?",
   
@@ -142,9 +142,9 @@
   "auth_first_surname": "Primer apellido (Opcional)",
   
   "auth_get_verification_code": "Obtener un código de verificación",
-  "auth_verification_description": "Vacio",
+  "auth_verification_description": "Para proteger tu cuenta, te pediremos que completes un paso de verificación para asegurarnos de que eres realmente la persona que intenta acceder",
   "auth_code_sent_to": "Se enviará un código de verificación a",
-  "auth_get": "Obtener",
+  "auth_get": "Enviar",
   
   "auth_enter_code": "Confirmar el código que recibiste",
   "auth_code_was_sent": "Ingrese el código de 6 dígitos que fue enviado a su número de teléfono",
@@ -172,5 +172,35 @@
   "auth_network_error": "Error de red. Por favor, inténtelo de nuevo.",
   "auth_generic_error": "Algo salió mal. Por favor, inténtelo de nuevo.",
   "auth_code_invalid": "El código debe tener 6 dígitos",
-  "auth_invalid_code": "Código inválido. Por favor, inténtelo de nuevo."
+  "auth_invalid_code": "Código inválido. Por favor, inténtelo de nuevo.",
+  "auth_choose_account": "Elige una cuenta",
+  "auth_choose_account_desc": "Hay dos cuentas de Google para {{email}}. ¿Qué cuenta deseas usar?",
+  "auth_workspace_account": "Cuenta de Google Workspace",
+  "auth_workspace_account_desc": "Una cuenta propiedad de dragonrock.com.ve",
+  "auth_personal_account": "Cuenta personal de Google",
+  "auth_personal_account_desc": "Una cuenta que creaste con Google",
+  "auth_more_info": "Más información",
+  "profile_add_picture": "Agregar foto de perfil",
+  "profile_from_computer": "Desde la computadora",
+  "profile_upload_computer": "Subir desde la computadora",
+  "profile_take_photo": "Tomar una foto",
+  "profile_click_to_take_photo": "Haz clic en cualquier lugar para tomar una foto",
+  "profile_drag_photo": "Arrastra una foto aquí",
+  "profile_camera": "Cámara",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "auth_update_password": "Puedes actualizar tu contraseña ahora si la olvidaste",
+  "update_password": "Actualizar contraseña",
+  "auth_atleast": "Al menos 8 caracteres",  
+  "auth_strong_password": "Crea una contraseña segura",
+  "auth_strong_password_description": "Crea una contraseña segura que no uses para otros sitios web.",
+  "auth_skip":"Omitir",
+  "auth_save_password":"Guardar contraseña",
+  "auth_email_required": "El correo electrónico es obligatorio",
+  "auth_otp_sent_success": "Código de verificación enviado con éxito",
+  "auth_otp_expired": "El código de verificación ha expirado. Por favor, solicita uno nuevo.",
+  "auth_password_min_length": "La contraseña debe tener al menos 8 caracteres",
+  "auth_password_updated": "Contraseña actualizada con éxito",
+  "auth_code_was_sent_email": "Ingresa el código de 6 dígitos que se envió a"
+
 }

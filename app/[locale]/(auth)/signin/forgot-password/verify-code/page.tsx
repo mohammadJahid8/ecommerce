@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/components/auth/auth-layout';
 import FloatingInput from '@/components/auth/FloatingInput';
-import { API_BASE_URL } from '@/lib/api-config';
 import Error from '@/components/auth/error';
+import { API_BASE_URL } from '@/lib/api-config';
 
 export default function VerifyCodePage() {
   const [code, setCode] = useState('');
@@ -16,14 +16,16 @@ export default function VerifyCodePage() {
   const [canResend, setCanResend] = useState(false);
 
   const searchParams = useSearchParams();
-  const phone = searchParams.get('phone');
-  const { t } = useTranslation();
+  const email = searchParams.get('email') || '';
+  const name = searchParams.get('name') || '';
   const router = useRouter();
+  const { t } = useTranslation();
 
+  // Countdown timer for resend
   useEffect(() => {
     if (timeLeft > 0) {
-      const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timerId);
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
     } else {
       setCanResend(true);
     }
@@ -38,6 +40,42 @@ export default function VerifyCodePage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (code.length !== 6) {
+      setError(t('auth_code_invalid'));
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/forgot-password/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        router.push(
+          `/signin/forgot-password/welcome?email=${email}&name=${
+            data.userName || name
+          }`
+        );
+      } else {
+        setError(data.message || t('auth_invalid_code'));
+      }
+    } catch (err) {
+      console.error('Error verifying code:', err);
+      setError(t('auth_network_error'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleResendCode = async () => {
     if (!canResend) return;
 
@@ -45,53 +83,22 @@ export default function VerifyCodePage() {
     setError('');
 
     try {
-      const userId = localStorage.getItem('userId');
-      const response = await fetch(`${API_BASE_URL}/signup/verify-phone`, {
+      const res = await fetch(`${API_BASE_URL}/forgot-password/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, phoneNumber: phone }),
+        body: JSON.stringify({ email }),
       });
+      const data = await res.json();
 
-      if (response.ok) {
+      if (res.ok && data.success) {
         setTimeLeft(60);
         setCanResend(false);
+        setCode('');
       } else {
-        const data = await response.json();
-        setError(data.message || data.error || t('auth_generic_error'));
+        setError(data.message || t('auth_generic_error'));
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setError(t('auth_network_error'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (code.length < 6) {
-      setError(t('auth_code_invalid'));
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const userId = localStorage.getItem('userId');
-      const response = await fetch(`${API_BASE_URL}/signup/verify-code`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, code }),
-      });
-      if (response.ok) {
-        router.push('/signup/review-account');
-      } else {
-        const data = await response.json();
-        setError(data.message || data.error || t('auth_invalid_code'));
-      }
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (err) {
+      console.error('Error resending code:', err);
       setError(t('auth_network_error'));
     } finally {
       setIsLoading(false);
@@ -101,13 +108,14 @@ export default function VerifyCodePage() {
   return (
     <AuthLayout
       title={t('auth_enter_code')}
-      description={t('auth_verification_description')}
+      description={''}
       isLoading={isLoading}
     >
       <div className='space-y-3 md:space-y-4'>
         {/* Verification Message */}
         <p className='text-sm md:text-base text-gray-700 dark:text-[#E3E3E3]'>
-          {t('auth_code_was_sent')} <span className='font-medium'>{phone}</span>
+          {t('auth_code_was_sent_email')}{' '}
+          <span className='font-medium'>{email}</span>
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -119,6 +127,12 @@ export default function VerifyCodePage() {
             onChange={handleCodeChange}
             prefix='N-'
           />
+
+          {error && (
+            <div className='mt-2'>
+              <Error error={error} />
+            </div>
+          )}
 
           <div className='flex items-center md:justify-end justify-between gap-10 pt-24'>
             <button
@@ -136,7 +150,6 @@ export default function VerifyCodePage() {
                 : t('auth_resend_code_timer', { seconds: timeLeft })}
             </button>
             <div className='flex flex-col items-end'>
-              {error && <Error error={error} />}
               <Button
                 type='submit'
                 disabled={isLoading || code.length < 6}

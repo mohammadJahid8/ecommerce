@@ -18,12 +18,15 @@ import LanguageSelector from '@/components/global/LanguageSelector';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { API_BASE_URL } from '@/lib/api-config';
+import Header from '@/components/global/Header';
+import ProfilePictureDialog from '@/components/profile/profile-picture-dialog';
+import { ThemeToggle } from '@/components/global/ThemeToggle/ThemeToggle';
 
 export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState('/image.png');
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -47,12 +50,13 @@ export default function ProfilePage() {
     fetchUser();
   }, []);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
-    }
+  const handleProfileClick = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleSaveProfilePicture = (imageUrl: string) => {
+    setProfileImage(imageUrl);
+    setIsDialogOpen(false);
   };
 
   if (isLoading) {
@@ -106,171 +110,175 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
-      <div className='max-w-[850px] mx-auto space-y-4'>
-        {/* Page Header */}
-        <div className='text-center mb-8'>
-          <h1 className='text-[28px] font-normal mb-2'>
-            {t('profile_personal_info')}
-          </h1>
-          <p className='text-slate-600 dark:text-slate-300 text-base'>
-            {t('profile_personal_info_desc')}
-          </p>
-        </div>
-
-        {/* Basic Info Section */}
-        <SectionCard
-          title={t('profile_basic_info')}
-          subtitle={t('profile_basic_info_desc')}
-          showHelpIcon
-        >
-          <InfoRow
-            label={t('profile_picture')}
-            value={t('profile_picture_desc')}
-            isProfilePhoto
-            imageSrc={profileImage}
-            onClick={() => fileInputRef.current?.click()}
-          />
-          <InfoRow label={t('name')} value={user?.username || 'John Doe'} />
-          <InfoRow
-            label={t('profile_birthday')}
-            value={
-              user?.dob
-                ? new Date(user.dob).toLocaleDateString()
-                : 'August 8, 2001'
-            }
-          />
-          <InfoRow label={t('auth_gender')} value={user?.gender} isLast />
-        </SectionCard>
-
-        <input
-          type='file'
-          ref={fileInputRef}
-          className='hidden'
-          accept='image/*'
-          onChange={handleImageUpload}
-        />
-
-        {/* Contact Info Section */}
-        <SectionCard title={t('profile_contact_info')}>
-          <InfoRow
-            label={t('profile_email')}
-            value={user?.email || 'example@gmail.com'}
-          />
-          <InfoRow
-            label={t('profile_phone')}
-            value={user?.phoneNumber || '13434343456'}
-          />
-
-          <div className='p-4 sm:p-6'>
-            <div className='text-sm font-medium mb-3 text-slate-600 dark:text-slate-400'>
-              {t('profile_more_options')}
-            </div>
-            <button className='flex items-center gap-2 px-4 py-2 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-blue-600 dark:text-blue-400'>
-              <Mail className='w-4 h-4' />
-              {t('profile_manage_emails')}
-            </button>
+    <>
+      <Header />
+      <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
+        <div className='max-w-[850px] mx-auto space-y-4'>
+          {/* Page Header */}
+          <div className='text-center mb-8'>
+            <h1 className='text-[28px] font-normal mb-2'>
+              {t('profile_personal_info')}
+            </h1>
+            <p className='text-slate-600 dark:text-slate-300 text-base'>
+              {t('profile_personal_info_desc')}
+            </p>
           </div>
-        </SectionCard>
 
-        {/* Addresses Section */}
-        <SectionCard
-          title={t('profile_addresses')}
-          subtitle={t('profile_addresses_desc')}
-          showHelpIcon
-        >
-          <InfoRow
-            label={t('profile_home')}
-            value='123 Main St, Anytown, USA'
-          />
-          <InfoRow label={t('profile_work')} value={t('profile_not_set')} />
-          <InfoRow
-            label={t('profile_other')}
-            value={t('profile_other_addresses')}
-            isLast
-          />
-        </SectionCard>
+          {/* Basic Info Section */}
+          <SectionCard
+            title={t('profile_basic_info')}
+            subtitle={t('profile_basic_info_desc')}
+            showHelpIcon
+          >
+            <InfoRow
+              label={t('profile_picture')}
+              value={t('profile_picture_desc')}
+              isProfilePhoto
+              imageSrc={profileImage}
+              onClick={handleProfileClick}
+            />
+            <InfoRow label={t('name')} value={user?.username || 'John Doe'} />
+            <InfoRow
+              label={t('profile_birthday')}
+              value={
+                user?.dob
+                  ? new Date(user.dob).toLocaleDateString()
+                  : 'August 8, 2001'
+              }
+            />
+            <InfoRow label={t('auth_gender')} value={user?.gender} isLast />
+          </SectionCard>
 
-        {/* Split Section: Password & Preferences */}
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          {/* Password Card */}
-          <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f] hover:bg-slate-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer group'>
-            <div className='p-4 sm:p-6 h-full flex flex-col relative'>
-              <h2 className='text-[22px] font-normal mb-2'>
-                {t('profile_password')}
-              </h2>
-              <p className='text-sm text-slate-600 dark:text-slate-400 mb-8'>
-                {t('profile_password_desc')}
-              </p>
+          {/* Contact Info Section */}
+          <SectionCard title={t('profile_contact_info')}>
+            <InfoRow
+              label={t('profile_email')}
+              value={user?.email || 'example@gmail.com'}
+            />
+            <InfoRow
+              label={t('profile_phone')}
+              value={user?.phoneNumber || '13434343456'}
+            />
 
-              <div className='flex items-center justify-between'>
-                <div>
-                  <div className='text-lg tracking-[0.2em] font-bold mb-1 text-gray-800 dark:text-gray-200'>
-                    ••••••••
+            <div className='p-4 sm:p-6'>
+              <div className='text-sm font-medium mb-3 text-slate-600 dark:text-slate-400'>
+                {t('profile_more_options')}
+              </div>
+              <button className='flex items-center gap-2 px-4 py-2 rounded border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm font-medium text-blue-600 dark:text-blue-400'>
+                <Mail className='w-4 h-4' />
+                {t('profile_manage_emails')}
+              </button>
+            </div>
+          </SectionCard>
+
+          {/* Addresses Section */}
+          <SectionCard
+            title={t('profile_addresses')}
+            subtitle={t('profile_addresses_desc')}
+            showHelpIcon
+          >
+            <InfoRow
+              label={t('profile_home')}
+              value='123 Main St, Anytown, USA'
+            />
+            <InfoRow label={t('profile_work')} value={t('profile_not_set')} />
+            <InfoRow
+              label={t('profile_other')}
+              value={t('profile_other_addresses')}
+              isLast
+            />
+          </SectionCard>
+
+          {/* Split Section: Password & Preferences */}
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            {/* Password Card */}
+            <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f] hover:bg-slate-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer group'>
+              <div className='p-4 sm:p-6 h-full flex flex-col relative'>
+                <h2 className='text-[22px] font-normal mb-2'>
+                  {t('profile_password')}
+                </h2>
+                <p className='text-sm text-slate-600 dark:text-slate-400 mb-8'>
+                  {t('profile_password_desc')}
+                </p>
+
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <div className='text-lg tracking-[0.2em] font-bold mb-1 text-gray-800 dark:text-gray-200'>
+                      ••••••••
+                    </div>
+                    <div className='text-xs text-gray-500 dark:text-gray-400'>
+                      {t('profile_last_changed')}
+                    </div>
                   </div>
-                  <div className='text-xs text-gray-500 dark:text-gray-400'>
-                    {t('profile_last_changed')}
+
+                  <div className='ml-4'>
+                    <ChevronRight className='w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors' />
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className='ml-4'>
-                  <ChevronRight className='w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors' />
-                </div>
+            {/* Preferences Card */}
+            <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f]'>
+              <div className='p-4 sm:p-6 pb-2'>
+                <h2 className='text-[22px] font-normal mb-2'>
+                  {t('profile_preferences')}
+                </h2>
+                <p className='text-sm text-slate-600 dark:text-slate-400'>
+                  {t('profile_preferences_desc')}
+                </p>
+              </div>
+
+              <div className='flex flex-col'>
+                <PreferenceRow
+                  icon={<Globe className='w-5 h-5' />}
+                  label={t('profile_language')}
+                  value={t('profile_language_value')}
+                />
+                <PreferenceRow
+                  icon={<Keyboard className='w-5 h-5' />}
+                  label={t('profile_input_tools')}
+                  value={t('profile_input_tools_desc')}
+                />
+                <PreferenceRow
+                  icon={<Accessibility className='w-5 h-5' />}
+                  label={t('profile_accessibility')}
+                  value={t('profile_accessibility_desc')}
+                  isLast
+                />
               </div>
             </div>
           </div>
 
-          {/* Preferences Card */}
-          <div className='border border-slate-300 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-[#1f1f1f]'>
-            <div className='p-4 sm:p-6 pb-2'>
-              <h2 className='text-[22px] font-normal mb-2'>
-                {t('profile_preferences')}
-              </h2>
-              <p className='text-sm text-slate-600 dark:text-slate-400'>
-                {t('profile_preferences_desc')}
-              </p>
+          {/* Footer */}
+          <footer className='mt-12 pt-8 border-t border-slate-200 dark:border-slate-700'>
+            <div className='flex items-center justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
+              <div className='flex items-center gap-2'>
+                <LanguageSelector />
+                <ThemeToggle isAuth={true} />
+              </div>
+              <nav className='flex items-center gap-3 md:gap-6 text-xs md:text-sm'>
+                <Link href='#' className='hover:underline'>
+                  {t('footer_help')}
+                </Link>
+                <Link href='#' className='hover:underline'>
+                  {t('footer_privacy')}
+                </Link>
+                <Link href='#' className='hover:underline'>
+                  {t('footer_terms')}
+                </Link>
+              </nav>
             </div>
-
-            <div className='flex flex-col'>
-              <PreferenceRow
-                icon={<Globe className='w-5 h-5' />}
-                label={t('profile_language')}
-                value={t('profile_language_value')}
-              />
-              <PreferenceRow
-                icon={<Keyboard className='w-5 h-5' />}
-                label={t('profile_input_tools')}
-                value={t('profile_input_tools_desc')}
-              />
-              <PreferenceRow
-                icon={<Accessibility className='w-5 h-5' />}
-                label={t('profile_accessibility')}
-                value={t('profile_accessibility_desc')}
-                isLast
-              />
-            </div>
-          </div>
+          </footer>
         </div>
-
-        {/* Footer */}
-        <footer className='mt-12 pt-8 border-t border-slate-200 dark:border-slate-700'>
-          <div className='flex md:flex-row flex-col md:items-center gap-10 md:gap-0 justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
-            <LanguageSelector />
-            <nav className='flex items-center gap-6'>
-              <Link href='#' className='hover:underline'>
-                {t('footer_help')}
-              </Link>
-              <Link href='#' className='hover:underline'>
-                {t('footer_privacy')}
-              </Link>
-              <Link href='#' className='hover:underline'>
-                {t('footer_terms')}
-              </Link>
-            </nav>
-          </div>
-        </footer>
       </div>
-    </div>
+
+      <ProfilePictureDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onSave={handleSaveProfilePicture}
+      />
+    </>
   );
 }
 

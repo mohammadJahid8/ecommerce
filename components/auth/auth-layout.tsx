@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import LanguageSelector from '@/components/global/LanguageSelector';
+import { ThemeToggle } from '../global/ThemeToggle/ThemeToggle';
 
 function GoogleMark({ className }: { className?: string }) {
   return (
@@ -29,23 +30,69 @@ function GoogleMark({ className }: { className?: string }) {
   );
 }
 
+// Google-style indeterminate linear progress bar
+function GoogleLoader() {
+  return (
+    <div className='absolute top-0 left-0 right-0 h-1 overflow-hidden rounded-t-3xl'>
+      <div className='h-full bg-gray-200 dark:bg-gray-700'>
+        <div className='h-full bg-blue-500 dark:bg-[#A8C7FA] animate-google-loader' />
+      </div>
+      <style jsx>{`
+        @keyframes google-loader {
+          0% {
+            width: 0%;
+            margin-left: 0%;
+          }
+          25% {
+            width: 50%;
+            margin-left: 25%;
+          }
+          50% {
+            width: 30%;
+            margin-left: 70%;
+          }
+          75% {
+            width: 50%;
+            margin-left: 25%;
+          }
+          100% {
+            width: 0%;
+            margin-left: 100%;
+          }
+        }
+        .animate-google-loader {
+          animation: google-loader 2s ease-in-out infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+
 interface AuthLayoutProps {
   title: string;
   description?: React.ReactNode;
   children: React.ReactNode;
+  isLoading?: boolean;
 }
 
 export default function AuthLayout({
   title,
   description,
   children,
+  isLoading = false,
 }: AuthLayoutProps) {
   const { t } = useTranslation();
 
   return (
-    <main className='min-h-screen flex items-center justify-center bg-white md:bg-[#f0f3f8] dark:bg-[#0e0e0e]  md:dark:bg-[#1e1f21] text-neutral-900 dark:text-neutral-100'>
-      <div className='w-full mx-auto max-w-[1040px] flex flex-col gap-10 md:gap-0 justify-between'>
-        <Card className='mx-auto rounded-3xl bg-white dark:bg-[#0e0e0e] shadow-none border-none w-full'>
+    <main className='min-h-[100dvh] md:min-h-screen flex items-center justify-center bg-white md:bg-[#f0f3f8] dark:bg-[#0e0e0e]  md:dark:bg-[#1e1f21] text-neutral-900 dark:text-neutral-100'>
+      <div className='w-full mx-auto max-w-[1120px] flex flex-col gap-10 md:gap-0 justify-between'>
+        <Card
+          className={cn(
+            'mx-auto rounded-3xl bg-white dark:bg-[#0e0e0e] shadow-none border-none w-full min-h-[402px] relative overflow-hidden transition-opacity duration-300',
+            isLoading && 'opacity-70'
+          )}
+        >
+          {isLoading && <GoogleLoader />}
           <CardContent className='p-6 sm:p-8 md:p-10'>
             <GoogleMark className='w-12 h-12' />
             <div className='grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-start mt-6'>
@@ -62,10 +109,13 @@ export default function AuthLayout({
           </CardContent>
         </Card>
 
-        <footer className='mt-4 md:px-2 px-6'>
-          <div className='flex md:flex-row flex-col md:items-center gap-10 md:gap-0 justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
-            <LanguageSelector />
-            <nav className='flex items-center gap-6'>
+        <footer className='mt-4 md:px-2 px-4'>
+          <div className='flex items-center justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
+            <div className='flex items-center gap-2'>
+              <LanguageSelector />
+              <ThemeToggle isAuth={true} />
+            </div>
+            <nav className='flex items-center gap-3 md:gap-6 text-xs md:text-sm'>
               <Link href='#' className='hover:underline'>
                 {t('footer_help')}
               </Link>

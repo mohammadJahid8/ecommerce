@@ -2,17 +2,15 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/components/auth/auth-layout';
-import { AlertCircle, X } from 'lucide-react';
-import { API_BASE_URL } from '@/lib/api-config';
+import FloatingInput from '@/components/auth/FloatingInput';
 import { useRouter } from 'next/navigation';
+import { API_BASE_URL } from '@/lib/api-config';
+import Error from '@/components/auth/error';
 
 export default function CreatePasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -45,7 +43,6 @@ export default function CreatePasswordPage() {
       try {
         const userId = localStorage.getItem('userId');
 
-        // ... inside component
         const response = await fetch(`${API_BASE_URL}/signup/password`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -70,88 +67,32 @@ export default function CreatePasswordPage() {
     <AuthLayout
       title={t('auth_create_secure_password')}
       description={t('auth_password_description')}
+      isLoading={isLoading}
     >
       <form className='space-y-3 md:space-y-4' onSubmit={handleSubmit}>
-        <div>
-          <Label htmlFor='password' className='sr-only'>
-            {t('auth_password_placeholder')}
-          </Label>
-          <div className='relative'>
-            <Input
-              id='password'
-              type={showPassword ? 'text' : 'password'}
-              placeholder={t('auth_password_placeholder')}
-              value={password}
-              onChange={(e) => handlePasswordChange(e.target.value)}
-              className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0 pr-10'
-            />
-            {password && (
-              <button
-                type='button'
-                onClick={() => handlePasswordChange('')}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors'
-                aria-label='Clear password'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
-        </div>
+        <FloatingInput
+          id='password'
+          label={t('auth_password_placeholder')}
+          type='password'
+          value={password}
+          onChange={handlePasswordChange}
+          showPasswordToggle
+        />
 
-        <div>
-          <Label htmlFor='confirm-password' className='sr-only'>
-            {t('auth_confirm_placeholder')}
-          </Label>
-          <div className='relative'>
-            <Input
-              id='confirm-password'
-              type={showPassword ? 'text' : 'password'}
-              placeholder={t('auth_confirm_placeholder')}
-              value={confirmPassword}
-              onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-              className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0 pr-10'
-            />
-            {confirmPassword && (
-              <button
-                type='button'
-                onClick={() => handleConfirmPasswordChange('')}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors'
-                aria-label='Clear confirm password'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
-        </div>
+        <FloatingInput
+          id='confirm-password'
+          label={t('auth_confirm_placeholder')}
+          type='password'
+          value={confirmPassword}
+          onChange={handleConfirmPasswordChange}
+          showPasswordToggle
+        />
 
         {/* Error Message */}
-        {showError && (
-          <div className='flex items-start'>
-            <AlertCircle className='w-4 h-4 text-red-500 dark:text-red-300 mt-0.5 mr-2 flex-shrink-0' />
-            <div className='text-sm text-red-700 dark:text-red-300'>
-              <p className='font-medium'>{t('auth_password_mismatch')}</p>
-            </div>
-          </div>
-        )}
-
-        <div className='flex items-center gap-2'>
-          <input
-            type='checkbox'
-            id='show-password'
-            checked={showPassword}
-            onChange={(e) => setShowPassword(e.target.checked)}
-            className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
-          />
-          <Label
-            htmlFor='show-password'
-            className='text-sm text-gray-700 dark:text-[#E3E3E3] cursor-pointer'
-          >
-            {t('auth_show_password')}
-          </Label>
-        </div>
+        {showError && <Error error={t('auth_password_mismatch')} />}
 
         <div className='flex flex-col items-end pt-6'>
-          {apiError && <p className='text-red-500 text-sm mb-2'>{apiError}</p>}
+          {apiError && <Error error={apiError} />}
           <Button
             type='submit'
             disabled={isLoading || !password || !confirmPassword}

@@ -6,6 +6,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import AuthLayout from '@/components/auth/auth-layout';
 import { useRouter } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/api-config';
+import Error from '@/components/auth/error';
 
 export default function VerifyPhonePage() {
   const { t } = useTranslation();
@@ -27,7 +28,6 @@ export default function VerifyPhonePage() {
     try {
       const userId = localStorage.getItem('userId');
 
-      // ... inside component
       const response = await fetch(`${API_BASE_URL}/signup/verify-phone`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,13 +53,11 @@ export default function VerifyPhonePage() {
     <AuthLayout
       title={t('auth_prove_not_robot')}
       description={t('verify_phone_description')}
+      isLoading={isLoading}
     >
       <form className='space-y-3 md:space-y-4' onSubmit={handleSubmit}>
         <div>
-          <p
-            // htmlFor='phone-input'
-            className='text-sm md:text-base text-gray-700 dark:text-[#E3E3E3] pb-4'
-          >
+          <p className='text-sm md:text-base text-gray-700 dark:text-[#E3E3E3] pb-4'>
             {t('auth_receive_verification')}
           </p>
           <PhoneInput
@@ -74,7 +72,7 @@ export default function VerifyPhonePage() {
           {t('auth_sms_charges')}
         </p>
         <div className='flex flex-col items-end pt-6'>
-          {error && <p className='text-red-500 text-sm mb-2'>{error}</p>}
+          {error && <Error error={error} />}
           <Button
             type='submit'
             disabled={isLoading || !phoneNumber}

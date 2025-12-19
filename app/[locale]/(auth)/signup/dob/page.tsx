@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import AuthLayout from '@/components/auth/auth-layout';
 import { API_BASE_URL } from '@/lib/api-config';
+import Error from '@/components/auth/error';
 
 const DobPage = () => {
   const [day, setDay] = useState('');
@@ -188,6 +189,7 @@ const DobPage = () => {
     <AuthLayout
       title={t('auth_basic_info')}
       description={t('auth_basic_info_desc')}
+      isLoading={isLoading}
     >
       <div className='space-y-6'>
         <form className='space-y-6' onSubmit={handleSubmit}>
@@ -262,27 +264,17 @@ const DobPage = () => {
             </p>
 
             <div className='space-y-2 pt-4'>
-              {errors.day && (
-                <p className='text-red-500 text-sm'>{errors.day}</p>
-              )}
-              {errors.month && (
-                <p className='text-red-500 text-sm'>{errors.month}</p>
-              )}
-              {errors.year && (
-                <p className='text-red-500 text-sm'>{errors.year}</p>
-              )}
-              {errors.date && (
-                <p className='text-red-500 text-sm'>{errors.date}</p>
-              )}
+              {errors.day && <Error error={errors.day} />}
+              {errors.month && <Error error={errors.month} />}
+              {errors.year && <Error error={errors.year} />}
+              {errors.date && <Error error={errors.date} />}
             </div>
           </div>
 
           {/* Error Messages Section - Always visible above button */}
 
           <div className='flex flex-col items-end pt-6'>
-            {apiError && (
-              <p className='text-red-500 text-sm mb-2'>{apiError}</p>
-            )}
+            {apiError && <Error error={apiError} />}
             <Button
               type='submit'
               disabled={!isFormValid || isLoading}

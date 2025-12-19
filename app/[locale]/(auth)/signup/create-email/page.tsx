@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { X } from 'lucide-react';
 import AuthLayout from '@/components/auth/auth-layout';
+import FloatingInput from '@/components/auth/FloatingInput';
 import { API_BASE_URL } from '@/lib/api-config';
+import Error from '@/components/auth/error';
 
 export default function CreateEmailPage() {
   const [email, setEmail] = useState('');
@@ -36,7 +36,6 @@ export default function CreateEmailPage() {
     try {
       const userId = localStorage.getItem('userId');
 
-      // ... inside component
       const response = await fetch(`${API_BASE_URL}/signup/email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,30 +59,18 @@ export default function CreateEmailPage() {
     <AuthLayout
       title={t('auth_how_youll_sign_in')}
       description={t('auth_create_gmail_address')}
+      isLoading={isLoading}
     >
       <form className='space-y-3 md:space-y-4' onSubmit={handleSubmit}>
         <div>
-          <div className='relative'>
-            <Input
-              id='email'
-              type='email'
-              placeholder={t('profile_email')}
-              value={email}
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0 pr-10'
-            />
-            {email && (
-              <button
-                type='button'
-                onClick={() => setEmail('')}
-                className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors'
-                aria-label='Clear input'
-              >
-                <X className='w-4 h-4' />
-              </button>
-            )}
-          </div>
+          <FloatingInput
+            id='email'
+            label={t('profile_email')}
+            type='email'
+            value={email}
+            onChange={setEmail}
+            required
+          />
           <div className='pt-2'>
             <p className='text-xs text-gray-600 dark:text-gray-400'>
               {t('auth_username_hint')}
@@ -96,7 +83,7 @@ export default function CreateEmailPage() {
         </p>
 
         <div className='flex flex-col items-end pt-6 md:pt-16'>
-          {error && <p className='text-red-500 text-sm mb-2'>{error}</p>}
+          {error && <Error error={error} />}
           <Button
             type='submit'
             disabled={isLoading || !email}

@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
-export default function Header({ categories }: { categories: ICategory[] }) {
+export default function Header({ categories }: { categories?: ICategory[] }) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isShadow, setShadow] = useState(false);
   const { t } = useTranslation();
@@ -54,7 +54,7 @@ export default function Header({ categories }: { categories: ICategory[] }) {
             </button>
           </div>
 
-          {openDrawer && <MenuReponsive categories={categories} />}
+          {openDrawer && <MenuReponsive categories={categories!} />}
 
           <div className=''>
             <ul className='flex'>

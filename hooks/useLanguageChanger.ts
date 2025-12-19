@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import i18nConfig from '@/i18nConfig';
 
 export interface Language {
@@ -12,7 +12,7 @@ export const useLanguageChanger = () => {
   const { t, i18n } = useTranslation();
   const currentLocale = i18n.language;
   const currentPathname = usePathname();
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const languages: Language[] = [
     { code: 'en', label: t('language_english') },
@@ -31,20 +31,25 @@ export const useLanguageChanger = () => {
     const expires = date.toUTCString();
     document.cookie = `NEXT_LOCALE=${newLocale};expires=${expires};path=/`;
 
-    // Redirect to the new locale path
-    if (
+    // Change language without navigation (preserves React state)
+    i18n.changeLanguage(newLocale);
+
+    // Build new path with locale change
+    let newPath =
       currentLocale === i18nConfig.defaultLocale &&
       // @ts-ignore
       !i18nConfig.prefixDefault
-    ) {
-      router.push('/' + newLocale + currentPathname);
-    } else {
-      router.push(
-        currentPathname.replace(`/${currentLocale}`, `/${newLocale}`)
-      );
+        ? '/' + newLocale + currentPathname
+        : currentPathname.replace(`/${currentLocale}`, `/${newLocale}`);
+
+    // Preserve query parameters
+    const queryString = searchParams.toString();
+    if (queryString) {
+      newPath = `${newPath}?${queryString}`;
     }
 
-    router.refresh();
+    // Update URL without navigation to reflect new locale
+    window.history.replaceState(null, '', newPath);
   };
 
   return {
