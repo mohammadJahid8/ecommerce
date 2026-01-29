@@ -1,0 +1,47 @@
+.wrapBtnLeftRight {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapCusMutiSlider {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.imagesContainer {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  transition: scroll 0.3s ease-in-out;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 0;
+}
+
+.imagesContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.image {
+  width: 200px;
+  margin: 5px;
+  border-radius: 8px;
+}
+
+.navBtn {
+  padding: 0;
+  cursor: pointer;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  height: 48px;
+  width: 48px;
+  border-width: 1px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
