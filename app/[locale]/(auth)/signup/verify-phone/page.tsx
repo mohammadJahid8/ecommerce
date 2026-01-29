@@ -2,11 +2,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { PhoneInput } from '@/components/ui/phone-input';
 import AuthLayout from '@/components/auth/auth-layout';
+// import FloatingPhoneInput from '@/components/auth/FloatingPhoneInput';
 import { useRouter } from 'next/navigation';
 import { API_BASE_URL } from '@/lib/api-config';
 import Error from '@/components/auth/error';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 export default function VerifyPhonePage() {
   const { t } = useTranslation();
@@ -35,7 +36,7 @@ export default function VerifyPhonePage() {
       });
       if (response.ok) {
         router.push(
-          `/signup/verify-phone-code?phone=${encodeURIComponent(phoneNumber)}`
+          `/signup/verify-phone-code?phone=${encodeURIComponent(phoneNumber)}`,
         );
       } else {
         const data = await response.json();
@@ -62,17 +63,16 @@ export default function VerifyPhonePage() {
           </p>
           <PhoneInput
             id='phone-input'
-            placeholder={t('auth_phone_placeholder')}
+            label={t('auth_phone_placeholder')}
             value={phoneNumber}
             onChange={setPhoneNumber}
-            className='h-[54px] text-base bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'
+            error={error}
           />
         </div>
         <p className='text-sm md:text-base text-gray-700 dark:text-[#E3E3E3] pt-4'>
           {t('auth_sms_charges')}
         </p>
         <div className='flex flex-col items-end pt-6'>
-          {error && <Error error={error} />}
           <Button
             type='submit'
             disabled={isLoading || !phoneNumber}

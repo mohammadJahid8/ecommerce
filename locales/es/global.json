@@ -31,7 +31,7 @@
   "your_integral_solution_for_recharges": "Tu solución integral de recargas, rápido, fácil y accesible desde cualquier dispositivo",
   "register": "Regístrate",
   "why_buy_on_the_google_store": "¿Por qué comprar en la Google Store.",
-  
+
   "auth_go_back_to": "Volver a",
   "auth_home": "Inicio",
   "auth_email_or_phone": "Correo electrónico o teléfono",
@@ -69,9 +69,10 @@
   "auth_future_date_error": "La fecha de nacimiento no puede estar en el futuro",
   "auth_invalid_day_error": "Día inválido para {{month}} {{year}}",
   "auth_min_age_error": "Debes tener al menos 13 años",
+  "auth_max_age_error": "Por favor, ingresa un año de nacimiento válido",
   "auth_error_occurred": "Se produjo un error",
   "auth_error_try_again": "Se produjo un error. Vuelve a intentarlo.",
-  
+
   "profile_personal_info": "Información personal",
   "profile_personal_info_desc": "Información sobre ti y tus preferencias en los servicios de Google",
   "profile_basic_info": "Información básica",
@@ -102,13 +103,13 @@
   "profile_input_tools_desc": "Escribe más fácilmente en tu idioma",
   "profile_accessibility": "Accesibilidad",
   "profile_accessibility_desc": "Colores de alto contraste DESACTIVADO",
-  
+
   "footer_help": "Ayuda",
   "footer_privacy": "Privacidad",
   "footer_terms": "Términos",
   "language_english": "English (United States)",
   "language_spanish": "Español (Latinoamérica)",
-  
+
   "auth_welcome": "Te damos la bienvenida nuevamente",
   "auth_enter_email_phone": "Introduce tu correo electrónico o número de teléfono",
   "auth_email_or_phone_placeholder": "Correo electrónico o teléfono",
@@ -117,43 +118,43 @@
   "auth_terms_of_service": "Términos del Servicio",
   "auth_privacy_policy": "Política de Privacidad",
   "auth_and": "y la",
-  
+
   "auth_create_secure_password": "Crea una contraseña segura",
   "auth_password_description": "Crea una contraseña segura con letras, números y símbolos combinados.",
   "auth_password_placeholder": "Contraseña",
   "auth_confirm_placeholder": "Confirmar",
   "auth_password_mismatch": "Elige una contraseña más segura. Intenta mezclar letras, números y símbolos.",
   "auth_show_password": "Mostrar contraseña",
-  
+
   "auth_verify_identity": "Para continuar, primero verifica que eres tú",
   "auth_enter_password": "Introduce tu contraseña",
   "auth_forgot_password": "¿Olvidaste la contraseña?",
-  
+
   "auth_verify_account": "Vamos a verificar tu cuenta",
   "auth_verify_residence": "Asegúrate de que tu país de residencia sea correcto",
   "auth_location_nationality": "Para continuar, primero introduce tu ubicación y nacionalidad.",
   "auth_country_residence": "Introduce tu país de residencia",
   "auth_nationality": "Introduce tu nacionalidad",
-  
+
   "auth_create_google_account": "Crear una cuenta de Google",
   "auth_enter_name": "Introduce tu nombre",
   "auth_passport_info": "Proporciona la siguiente información tal como aparece en tu pasaporte o documento de identidad.",
   "auth_first_name": "Nombre",
   "auth_first_surname": "Primer apellido (Opcional)",
-  
+
   "auth_get_verification_code": "Obtener un código de verificación",
   "auth_verification_description": "Para proteger tu cuenta, te pediremos que completes un paso de verificación para asegurarnos de que eres realmente la persona que intenta acceder",
   "auth_code_sent_to": "Se enviará un código de verificación a",
   "auth_get": "Enviar",
-  
+
   "auth_enter_code": "Confirmar el código que recibiste",
   "auth_code_was_sent": "Ingrese el código de 6 dígitos que fue enviado a su número de teléfono",
   "auth_enter_code_placeholder": "Introduce el código",
-  
+
   "auth_prove_not_robot": "Demuestra que no eres un robot",
   "auth_receive_verification": "Recibirás un código de verificación en tu teléfono",
   "auth_phone_placeholder": "Número de teléfono",
-  "auth_sms_charges": "Nos validaremos tu número por SMS (pueden aplicarse cargos)", 
+  "auth_sms_charges": "Validaremos tu número por SMS (es posible que se apliquen cargos)",
   "why_we_ask": "¿Por qué preguntamos por tu fecha de nacimiento y género?",
   "auth_how_youll_sign_in": "Cómo iniciarás sesión",
   "auth_create_gmail_address": "Crea una dirección de correo electrónico para iniciar sesión en tu cuenta",
@@ -161,7 +162,7 @@
   "auth_username_suffix": "@gmail.com",
   "auth_username_hint": "Puedes usar letras, números y puntos",
   "auth_by_continuing": "Al continuar, confirmas que has leído y aceptas nuestros Términos de Servicio y Política de Privacidad.",
-  "verify_phone_description": "Para continuar, primero introduce tu ubicación y nacionalidad.",
+  "verify_phone_description": "Por seguridad, necesitamos verificar tu identidad antes de continuar.",
   "get_new_code": "Generar nuevo código (60 segundos)",
   "auth_resend_code_timer": "Generar nuevo código ({{seconds}} segundos)",
   "auth_resend_code_link": "Obtener nuevo código",
@@ -172,7 +173,7 @@
   "auth_network_error": "Error de red. Por favor, inténtelo de nuevo.",
   "auth_generic_error": "Algo salió mal. Por favor, inténtelo de nuevo.",
   "auth_code_invalid": "El código debe tener 6 dígitos",
-  "auth_invalid_code": "Código inválido. Por favor, inténtelo de nuevo.",
+  "auth_invalid_code": "El código no es correcto. Inténtalo de nuevo.",
   "auth_choose_account": "Elige una cuenta",
   "auth_choose_account_desc": "Hay dos cuentas de Google para {{email}}. ¿Qué cuenta deseas usar?",
   "auth_workspace_account": "Cuenta de Google Workspace",
@@ -191,16 +192,28 @@
   "save": "Guardar",
   "auth_update_password": "Puedes actualizar tu contraseña ahora si la olvidaste",
   "update_password": "Actualizar contraseña",
-  "auth_atleast": "Al menos 8 caracteres",  
+  "auth_atleast": "Al menos 8 caracteres",
   "auth_strong_password": "Crea una contraseña segura",
   "auth_strong_password_description": "Crea una contraseña segura que no uses para otros sitios web.",
-  "auth_skip":"Omitir",
-  "auth_save_password":"Guardar contraseña",
+  "auth_skip": "Omitir",
+  "auth_save_password": "Guardar contraseña",
   "auth_email_required": "El correo electrónico es obligatorio",
   "auth_otp_sent_success": "Código de verificación enviado con éxito",
   "auth_otp_expired": "El código de verificación ha expirado. Por favor, solicita uno nuevo.",
   "auth_password_min_length": "La contraseña debe tener al menos 8 caracteres",
   "auth_password_updated": "Contraseña actualizada con éxito",
-  "auth_code_was_sent_email": "Ingresa el código de 6 dígitos que se envió a"
-
+  "auth_code_was_sent_email": "Ingresa el código de 6 dígitos que se envió a",
+  "auth_invalid_email": "Dirección de correo no válida.",
+  "auth_account_not_found": "No pudimos encontrar tu Cuenta",
+  "auth_email_already_registered": "Ese correo electrónico ya está registrado",
+  "auth_password_requirements": "Usa 8 o más caracteres con una combinación de letras, números y símbolos",
+  "auth_passwords_dont_match": "Las contraseñas no coinciden. Inténtalo de nuevo.",
+  "auth_wrong_password": "La contraseña es incorrecta. Inténtalo de nuevo o haz clic en \"¿Olvidaste tu contraseña?\"",
+  "profile_search": "Buscar",
+  "help_title": "Ayuda",
+  "help_center": "Ayuda",
+  "send_feedback": "Enviar comentarios",
+  "keyboard_shortcuts": "Combinaciones de teclas",
+  "manage_account": "Gestionar tu Cuenta de Google",
+  "sign_out": "Cerrar sesión"
 }

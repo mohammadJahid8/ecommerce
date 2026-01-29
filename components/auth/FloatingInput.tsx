@@ -10,6 +10,7 @@ interface FloatingInputProps {
   value: string;
   onChange: (value: string) => void;
   onClear?: () => void;
+  onBlur?: () => void;
   showPasswordToggle?: boolean;
   error?: string;
   className?: string;
@@ -25,6 +26,7 @@ export default function FloatingInput({
   value,
   onChange,
   onClear,
+  onBlur,
   showPasswordToggle = false,
   error,
   className,
@@ -205,7 +207,7 @@ export default function FloatingInput({
           error && 'border-red-500 dark:border-red-400',
           disabled && 'opacity-50 cursor-not-allowed',
           // CSS fallback for focus state
-          'focus-within:border-blue-500 dark:focus-within:border-[#A8C7FA]'
+          'focus-within:border-blue-500 dark:focus-within:border-[#A8C7FA]',
         )}
       >
         {/* Floating Label - uses both JS state and CSS :focus-within */}
@@ -226,7 +228,7 @@ export default function FloatingInput({
             '[.floating-input-container:focus-within_&]:text-xs',
             '[.floating-input-container:focus-within_&]:text-blue-500',
             '[.floating-input-container:focus-within_&]:dark:text-[#A8C7FA]',
-            '[.floating-input-container:focus-within_&]:!left-3'
+            '[.floating-input-container:focus-within_&]:!left-3',
           )}
         >
           {label}
@@ -254,7 +256,10 @@ export default function FloatingInput({
             }
           }}
           onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => {
+            setIsFocused(false);
+            onBlur?.();
+          }}
           disabled={disabled}
           className={cn(
             'w-full h-full py-2 text-base bg-transparent rounded-md outline-none',
@@ -266,8 +271,8 @@ export default function FloatingInput({
             value && showPasswordToggle && type === 'password'
               ? 'pr-20'
               : value || (showPasswordToggle && type === 'password')
-              ? 'pr-10'
-              : 'pr-3'
+                ? 'pr-10'
+                : 'pr-3',
           )}
         />
 

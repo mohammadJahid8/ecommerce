@@ -19,7 +19,7 @@ export default function CreateEmailPage() {
     return String(email)
       .toLowerCase()
       .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
       );
   };
 
@@ -45,7 +45,13 @@ export default function CreateEmailPage() {
         router.push('/signup/create-password');
       } else {
         const data = await response.json();
-        setError(data.message || data.error || t('auth_generic_error'));
+        // Handle specific error messages with translations
+        const errorMessage = data.message || data.error;
+        if (errorMessage === 'Email already registered') {
+          setError(t('auth_email_already_registered'));
+        } else {
+          setError(errorMessage || t('auth_generic_error'));
+        }
       }
     } catch (error) {
       console.error('Error:', error);
@@ -69,7 +75,7 @@ export default function CreateEmailPage() {
             type='email'
             value={email}
             onChange={setEmail}
-            required
+            error={error}
           />
           <div className='pt-2'>
             <p className='text-xs text-gray-600 dark:text-gray-400'>
@@ -83,7 +89,6 @@ export default function CreateEmailPage() {
         </p>
 
         <div className='flex flex-col items-end pt-6 md:pt-16'>
-          {error && <Error error={error} />}
           <Button
             type='submit'
             disabled={isLoading || !email}

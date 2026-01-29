@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import AuthLayout from '@/components/auth/auth-layout';
 import FloatingInput from '@/components/auth/FloatingInput';
 import { API_BASE_URL } from '@/lib/api-config';
-import Error from '@/components/auth/error';
 
 export default function PasswordPage() {
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -35,11 +35,16 @@ export default function PasswordPage() {
         localStorage.setItem('userId', data.userId);
         router.push('/profile');
       } else {
-        setError(data.message || 'Invalid password');
+        // Handle invalid password with translated message
+        if (data.message === 'Invalid password') {
+          setError(t('auth_wrong_password'));
+        } else {
+          setError(data.message || t('auth_wrong_password'));
+        }
       }
     } catch (error) {
       console.error('Error verifying password:', error);
-      setError('An error occurred');
+      setError(t('auth_network_error'));
     } finally {
       setIsLoading(false);
     }
@@ -69,29 +74,44 @@ export default function PasswordPage() {
           <FloatingInput
             id='password'
             label={t('auth_enter_password')}
-            type='password'
+            type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(value) => {
               setPassword(value);
               setError('');
             }}
             onClear={() => setError('')}
-            showPasswordToggle
+            error={error}
           />
 
-          {error && <Error error={error} />}
+          {/* Show Password Checkbox */}
+          <div className='flex items-center gap-3 pt-3'>
+            <input
+              type='checkbox'
+              id='show-password'
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+              className='w-[18px] h-[18px] rounded border-gray-300 dark:border-gray-500 text-blue-600 dark:text-[#A8C7FA] focus:ring-blue-500 dark:focus:ring-[#A8C7FA] cursor-pointer accent-blue-600 dark:accent-[#A8C7FA]'
+            />
+            <label
+              htmlFor='show-password'
+              className='text-sm text-gray-700 dark:text-[#E3E3E3] cursor-pointer select-none'
+            >
+              {t('auth_show_password')}
+            </label>
+          </div>
         </div>
 
         <div className='flex items-center md:justify-end justify-between gap-10 pt-6'>
           <Link
             href={`/signin/forgot-password?email=${email}&name=${userName}`}
-            className='text-sm font-medium text-blue-600 dark:text-[#A8C7FA] hover:underline focus:underline outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded'
+            className='text-sm font-medium text-blue-600 dark:text-[#A8C7FA] px-6 py-2.5 rounded-full hover:bg-blue-50 dark:hover:bg-[#A8C7FA]/10 transition-colors'
           >
             {t('auth_forgot_password')}
           </Link>
           <Button
             type='submit'
-            disabled={isLoading}
+            disabled={isLoading || !password}
             className='bg-blue-600 hover:bg-blue-700 text-white dark:text-black px-6 h-10 rounded-[20px] dark:bg-[#A8C7FA] disabled:opacity-50'
           >
             {isLoading ? t('auth_loading') : t('auth_next')}

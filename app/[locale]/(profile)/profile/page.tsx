@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import {
@@ -18,9 +18,9 @@ import LanguageSelector from '@/components/global/LanguageSelector';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { API_BASE_URL } from '@/lib/api-config';
-import Header from '@/components/global/Header';
 import ProfilePictureDialog from '@/components/profile/profile-picture-dialog';
 import { ThemeToggle } from '@/components/global/ThemeToggle/ThemeToggle';
+import ProfileHeader from '@/components/profile/ProfileHeader';
 
 export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState('/image.png');
@@ -111,7 +111,15 @@ export default function ProfilePage() {
 
   return (
     <>
-      <Header />
+      <ProfileHeader
+        userInitial={user?.username?.charAt(0) || user?.email?.charAt(0) || 'J'}
+        userName={user?.username || 'John Doe'}
+        userEmail={user?.email || 'example@gmail.com'}
+        onMenuClick={() => {
+          // TODO: Open navigation drawer
+          console.log('Menu clicked');
+        }}
+      />
       <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
         <div className='max-w-[850px] mx-auto space-y-4'>
           {/* Page Header */}
@@ -333,7 +341,7 @@ function InfoRow({
       onClick={onClick}
       className={cn(
         'flex items-center justify-between p-4 sm:px-6 sm:py-4 hover:bg-slate-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer group',
-        !isLast && 'border-b border-slate-200 dark:border-slate-700'
+        !isLast && 'border-b border-slate-200 dark:border-slate-700',
       )}
     >
       <div className={cn('flex-1 pr-4', isProfilePhoto ? 'py-2' : '')}>
@@ -384,7 +392,7 @@ function PreferenceRow({
     <div
       className={cn(
         'flex items-center p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-[#2a2a2a] transition-colors cursor-pointer',
-        !isLast && 'border-b border-slate-200 dark:border-slate-700'
+        !isLast && 'border-b border-slate-200 dark:border-slate-700',
       )}
     >
       <div className='flex-shrink-0 mr-4 text-slate-500 dark:text-slate-400'>

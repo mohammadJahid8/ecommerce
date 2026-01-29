@@ -28,11 +28,13 @@ type PhoneInputProps = Omit<
 > &
   Omit<RPNInput.Props<typeof RPNInput.default>, 'onChange'> & {
     onChange?: (value: RPNInput.Value) => void;
+    label?: string;
+    error?: string;
   };
 
 const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
   React.forwardRef<React.ElementRef<typeof RPNInput.default>, PhoneInputProps>(
-    ({ className, onChange, ...props }, ref) => {
+    ({ className, onChange, label, error, ...props }, ref) => {
       const [country, setCountry] = useState('US');
 
       React.useEffect(() => {
@@ -41,31 +43,91 @@ const PhoneInput: React.ForwardRefExoticComponent<PhoneInputProps> =
           .then((data) => setCountry(data.country));
       }, []);
       return (
-        <RPNInput.default
-          ref={ref}
-          className={cn('flex', className)}
-          flagComponent={FlagComponent}
-          countrySelectComponent={CountrySelect}
-          inputComponent={InputComponent}
-          smartCaret={false}
-          defaultCountry={country as RPNInput.Country}
-          /**
-           * Handles the onChange event.
-           *
-           * react-phone-number-input might trigger the onChange event as undefined
-           * when a valid phone number is not entered. To prevent this,
-           * the value is coerced to an empty string.
-           *
-           * @param {E164Number | undefined} value - The entered value
-           */
-          onChange={(value) => onChange?.(value || ('' as RPNInput.Value))}
-          {...props}
-        />
+        <div className='relative'>
+          <RPNInput.default
+            ref={ref}
+            className={cn('flex', className)}
+            flagComponent={FlagComponent}
+            countrySelectComponent={CountrySelect}
+            inputComponent={(inputProps) => (
+              <FloatingInputComponent
+                {...inputProps}
+                label={label}
+                error={error}
+                hasValue={!!props.value}
+              />
+            )}
+            smartCaret={false}
+            defaultCountry={country as RPNInput.Country}
+            onChange={(value) => onChange?.(value || ('' as RPNInput.Value))}
+            {...props}
+          />
+          {/* Error message */}
+          {error && (
+            <p className='mt-1 text-xs text-red-500 dark:text-red-400'>
+              {error}
+            </p>
+          )}
+        </div>
       );
-    }
+    },
   );
 PhoneInput.displayName = 'PhoneInput';
 
+interface FloatingInputProps extends React.ComponentProps<'input'> {
+  label?: string;
+  error?: string;
+  hasValue?: boolean;
+}
+
+const FloatingInputComponent = React.forwardRef<
+  HTMLInputElement,
+  FloatingInputProps
+>(({ className, label, error, hasValue, onFocus, onBlur, ...props }, ref) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const isActive = isFocused || hasValue;
+
+  return (
+    <div className='relative flex-1'>
+      {/* Floating Label */}
+      {label && (
+        <label
+          className={cn(
+            'absolute transition-all duration-200 pointer-events-none bg-white dark:bg-[#0e0e0e] px-1 z-10 left-3',
+            isActive
+              ? 'top-0 -translate-y-1/2 text-xs text-blue-500 dark:text-[#A8C7FA]'
+              : 'top-1/2 -translate-y-1/2 text-base text-gray-500 dark:text-[#E3E3E3]',
+            error && 'text-red-500 dark:text-red-400',
+          )}
+        >
+          {label}
+        </label>
+      )}
+      <Input
+        className={cn(
+          'rounded-lg h-[54px] md:text-base dark:bg-transparent dark:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0',
+          // Hide placeholder when label is present
+          label && 'placeholder:text-transparent',
+          error && 'border-red-500 dark:border-red-400',
+          className,
+        )}
+        {...props}
+        ref={ref}
+        onFocus={(e) => {
+          setIsFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setIsFocused(false);
+          onBlur?.(e);
+        }}
+      />
+    </div>
+  );
+});
+FloatingInputComponent.displayName = 'FloatingInputComponent';
+
+// Keep original InputComponent for backward compatibility
 const InputComponent = React.forwardRef<
   HTMLInputElement,
   React.ComponentProps<'input'>
@@ -73,7 +135,7 @@ const InputComponent = React.forwardRef<
   <Input
     className={cn(
       'rounded-lg h-[54px] md:text-base dark:bg-transparent dark:text-[#E3E3E3] dark:placeholder:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0',
-      className
+      className,
     )}
     {...props}
     ref={ref}
@@ -112,7 +174,7 @@ const CountrySelect = ({
           <ChevronDown
             className={cn(
               'ml-2 size-4 opacity-50',
-              disabled ? 'hidden' : 'opacity-100'
+              disabled ? 'hidden' : 'opacity-100',
             )}
           />
         </Button>
@@ -133,7 +195,7 @@ const CountrySelect = ({
                       selectedCountry={selectedCountry}
                       onChange={onChange}
                     />
-                  ) : null
+                  ) : null,
                 )}
               </CommandGroup>
             </ScrollArea>
@@ -160,7 +222,7 @@ const CountrySelectOption = ({
       <FlagComponent country={country} countryName={countryName} />
       <span className='flex-1 text-sm'>{countryName}</span>
       <span className='text-sm text-foreground/50'>{`+${RPNInput.getCountryCallingCode(
-        country
+        country,
       )}`}</span>
       <CheckIcon
         className={`ml-auto size-4 ${

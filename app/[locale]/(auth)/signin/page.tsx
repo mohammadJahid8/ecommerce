@@ -51,8 +51,25 @@ export default function SignInPage() {
   const router = useRouter();
   const { t } = useTranslation();
 
+  // Email validation function
+  const validateEmail = (email: string) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    // Validate email format first
+    if (!validateEmail(identifier)) {
+      setError(t('auth_invalid_email'));
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/signin/check-email`, {
@@ -63,14 +80,14 @@ export default function SignInPage() {
       const data = await res.json();
       if (data.exists) {
         router.push(
-          `/signin/choose-account?email=${identifier}&name=${data.username}`
+          `/signin/choose-account?email=${identifier}&name=${data.username}`,
         );
       } else {
-        setError('Email not found');
+        setError(t('auth_account_not_found'));
       }
     } catch (error) {
       console.error('Error checking email:', error);
-      setError('An error occurred');
+      setError(t('auth_network_error'));
     } finally {
       setIsLoading(false);
     }
@@ -104,8 +121,8 @@ export default function SignInPage() {
               setError('');
             }}
             onClear={() => setError('')}
+            error={error}
           />
-          {error && <Error error={error} />}
           <div className='pt-2'>
             <Link
               href='#'
@@ -138,8 +155,8 @@ export default function SignInPage() {
 
         <div className='flex items-center md:justify-end justify-between gap-10 pt-6'>
           <Link
-            href='#'
-            className='text-sm font-medium text-blue-600 dark:text-[#A8C7FA] hover:underline'
+            href='/signup/username'
+            className='text-sm font-medium text-blue-600 dark:text-[#A8C7FA] px-6 py-2.5 rounded-full hover:bg-blue-50 dark:hover:bg-[#A8C7FA]/10 transition-colors'
           >
             {t('auth_create_account')}
           </Link>

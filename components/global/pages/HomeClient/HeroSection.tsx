@@ -12,6 +12,7 @@ import tab from '@/assets/images/tab.png';
 import tab1 from '@/assets/images/tab1.png';
 import tab2 from '@/assets/images/tab2.png';
 import tabback from '@/assets/images/tab-back.png';
+import CheckBalance from './CheckBalance';
 
 const vrImages = [tab2, tabback, tab, tab1];
 const HeroSection: React.FC<CommonProps> = ({ t }) => {
@@ -30,21 +31,12 @@ const HeroSection: React.FC<CommonProps> = ({ t }) => {
               <p className='my-4 text-center md:text-start'>
                 {t('hero_description')}
               </p>
-              <div className='flex justify-center items-center md:justify-start md:items-start'>
-                <Button className='bg-[#1967D2] text-white px-3 py-2 font-medium rounded-md mt-4 sm:px-5 sm:py-2.5 text-xs md:text-sm'>
+              <div className='flex justify-center items-center md:justify-start md:items-start gap-3'>
+                <Button className='bg-[#1967D2] text-white px-3 py-2 font-medium rounded-md sm:px-5 sm:py-2.5 text-xs md:text-sm transition-all duration-300 hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)]'>
                   {t('signup')}
                 </Button>
+                <CheckBalance />
               </div>
-            </div>
-            <div className='lg:absolute bottom-6 flex lg:flex-row flex-col items-center lg:space-x-2 w-full max-w-[400px] mx-auto mt-5 gap-2'>
-              <input
-                type='text'
-                placeholder={t('hero_input_placeholder')}
-                className='rounded-md px-4 py-2 w-full h-10 dark:bg-[#373a3e] dark:text-white'
-              />
-              <button className='px-3 bg-[#1967D2] text-white rounded-md w-full lg:w-auto h-10 whitespace-nowrap font-medium text-xs md:text-sm'>
-                {t('check_balance')}
-              </button>
             </div>
           </div>
         </div>

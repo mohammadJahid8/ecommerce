@@ -3,17 +3,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import AuthLayout from '@/components/auth/auth-layout';
 import { API_BASE_URL } from '@/lib/api-config';
 import Error from '@/components/auth/error';
+import FloatingInput from '@/components/auth/FloatingInput';
+import FloatingSelect from '@/components/auth/FloatingSelect';
 
 const DobPage = () => {
   const [day, setDay] = useState('');
@@ -29,8 +23,7 @@ const DobPage = () => {
   const router = useRouter();
   const { t } = useTranslation();
 
-  // Generate arrays for dropdowns
-  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+  // Month options for select
   const months = [
     { value: '1', label: t('auth_january') },
     { value: '2', label: t('auth_february') },
@@ -45,10 +38,19 @@ const DobPage = () => {
     { value: '11', label: t('auth_november') },
     { value: '12', label: t('auth_december') },
   ];
+
+  // Gender options for select
+  const genderOptions = [
+    { value: 'male', label: t('auth_male') },
+    { value: 'female', label: t('auth_female') },
+    { value: 'other', label: t('auth_other') },
+    { value: 'prefer-not-to-say', label: t('auth_prefer_not_to_say') },
+  ];
+
+  // Current year for validation
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 120 }, (_, i) =>
-    (currentYear - i).toString()
-  );
+  const minYear = currentYear - 100; // 1926 (max 100 years old)
+  const maxYear = currentYear - 13; // 2013 (min 13 years old)
 
   // Leap year calculation
   const isLeapYear = (year: number): boolean => {
@@ -82,27 +84,38 @@ const DobPage = () => {
       const monthNum = parseInt(month);
       const yearNum = parseInt(year);
 
-      // Check if date is in the future
-      const selectedDate = new Date(yearNum, monthNum - 1, dayNum);
-      const today = new Date();
-      if (selectedDate > today) {
-        newErrors.date = t('auth_future_date_error');
+      // Validate year range (must be 13-100 years old)
+      if (yearNum < minYear) {
+        newErrors.year = t('auth_max_age_error');
+      } else if (yearNum > maxYear) {
+        newErrors.year = t('auth_min_age_error');
       }
 
       // Check if day is valid for the selected month and year
-      const maxDays = getMaxDaysInMonth(monthNum, yearNum);
-      if (dayNum > maxDays) {
-        newErrors.day = t('auth_invalid_day_error', {
-          month: months[monthNum - 1].label,
-          year: yearNum,
-        });
+      if (monthNum >= 1 && monthNum <= 12 && yearNum >= minYear) {
+        const maxDays = getMaxDaysInMonth(monthNum, yearNum);
+        if (dayNum < 1 || dayNum > maxDays) {
+          newErrors.day = t('auth_invalid_day_error', {
+            month: months[monthNum - 1].label,
+            year: yearNum,
+          });
+        }
       }
 
-      // Check minimum age (e.g., must be at least 13 years old)
-      const minDate = new Date();
-      minDate.setFullYear(minDate.getFullYear() - 13);
-      if (selectedDate > minDate) {
-        newErrors.date = t('auth_min_age_error');
+      // Check if date is in the future
+      if (!newErrors.day && !newErrors.year) {
+        const selectedDate = new Date(yearNum, monthNum - 1, dayNum);
+        const today = new Date();
+        if (selectedDate > today) {
+          newErrors.date = t('auth_future_date_error');
+        }
+
+        // Check minimum age (must be at least 13 years old)
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 13);
+        if (selectedDate > minDate) {
+          newErrors.date = t('auth_min_age_error');
+        }
       }
     }
 
@@ -120,9 +133,10 @@ const DobPage = () => {
       setIsLoading(true);
       try {
         const userId = localStorage.getItem('userId');
-        const dob = new Date(`${year}-${month}-${day}`);
+        const dob = new Date(
+          `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+        );
 
-        // ... inside component
         const response = await fetch(`${API_BASE_URL}/signup/dob`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -143,16 +157,33 @@ const DobPage = () => {
     }
   };
 
+  // Handle day input - only allow numbers 1-31
   const handleDayChange = (value: string) => {
-    setDay(value);
-    if (month && year) {
-      validateDate(value, month, year);
+    // Remove non-numeric characters
+    const numericValue = value.replace(/[^0-9]/g, '');
+
+    // Limit to 2 digits
+    const limitedValue = numericValue.slice(0, 2);
+
+    // Validate range (1-31)
+    const numValue = parseInt(limitedValue);
+    if (limitedValue === '' || (numValue >= 1 && numValue <= 31)) {
+      setDay(limitedValue);
+      if (month && year && limitedValue) {
+        validateDate(limitedValue, month, year);
+      }
+    } else if (numValue > 31) {
+      // If entered value is greater than 31, cap at 31
+      setDay('31');
+      if (month && year) {
+        validateDate('31', month, year);
+      }
     }
   };
 
   const handleMonthChange = (value: string) => {
     setMonth(value);
-    // If day is selected and it's invalid for the new month, clear it
+    // If day is set and it's invalid for the new month, revalidate
     if (day && year) {
       const dayNum = parseInt(day);
       const monthNum = parseInt(value);
@@ -160,30 +191,48 @@ const DobPage = () => {
       const maxDays = getMaxDaysInMonth(monthNum, yearNum);
 
       if (dayNum > maxDays) {
-        setDay('');
+        setDay(maxDays.toString());
+        validateDate(maxDays.toString(), value, year);
+      } else {
+        validateDate(day, value, year);
       }
-      validateDate(day, value, year);
     }
   };
 
+  // Handle year input - validate range and format
   const handleYearChange = (value: string) => {
-    setYear(value);
-    // If day and month are selected, revalidate for leap year
-    if (day && month) {
+    // Remove non-numeric characters
+    const numericValue = value.replace(/[^0-9]/g, '');
+
+    // Limit to 4 digits
+    const limitedValue = numericValue.slice(0, 4);
+
+    setYear(limitedValue);
+
+    // Only validate when 4 digits are entered
+    if (limitedValue.length === 4 && day && month) {
+      const yearNum = parseInt(limitedValue);
       const dayNum = parseInt(day);
       const monthNum = parseInt(month);
-      const yearNum = parseInt(value);
       const maxDays = getMaxDaysInMonth(monthNum, yearNum);
 
+      // Adjust day if invalid for the year (e.g., Feb 29 on non-leap year)
       if (dayNum > maxDays) {
-        setDay('');
+        setDay(maxDays.toString());
+        validateDate(maxDays.toString(), month, limitedValue);
+      } else {
+        validateDate(day, month, limitedValue);
       }
-      validateDate(day, month, value);
     }
   };
 
   const isFormValid =
-    day && month && year && gender && Object.keys(errors).length === 0;
+    day &&
+    month &&
+    year &&
+    year.length === 4 &&
+    gender &&
+    Object.keys(errors).length === 0;
 
   return (
     <AuthLayout
@@ -193,86 +242,63 @@ const DobPage = () => {
     >
       <div className='space-y-6'>
         <form className='space-y-6' onSubmit={handleSubmit}>
-          {/* Date of Birth Section */}
+          {/* Date of Birth Section - Order: Month, Day, Year */}
           <div className='space-y-4'>
             <div className='grid grid-cols-3 gap-4'>
+              {/* Month - FloatingSelect */}
               <div>
-                <Select value={day} onValueChange={handleDayChange}>
-                  <SelectTrigger className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'>
-                    <SelectValue placeholder={t('auth_day')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {days.map((d) => (
-                      <SelectItem key={d} value={d}>
-                        {d}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FloatingSelect
+                  label={t('auth_month')}
+                  value={month}
+                  options={months}
+                  onChange={handleMonthChange}
+                  error={errors.month}
+                />
               </div>
 
+              {/* Day - FloatingInput (text input, numbers only 1-31) */}
               <div>
-                <Select value={month} onValueChange={handleMonthChange}>
-                  <SelectTrigger className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'>
-                    <SelectValue placeholder={t('auth_month')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((m) => (
-                      <SelectItem key={m.value} value={m.value}>
-                        {m.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FloatingInput
+                  label={t('auth_day')}
+                  type='text'
+                  value={day}
+                  onChange={handleDayChange}
+                  error={errors.day}
+                />
               </div>
 
+              {/* Year - FloatingInput (text input, 4 digits) */}
               <div>
-                <Select value={year} onValueChange={handleYearChange}>
-                  <SelectTrigger className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'>
-                    <SelectValue placeholder={t('auth_year')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((y) => (
-                      <SelectItem key={y} value={y}>
-                        {y}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <FloatingInput
+                  label={t('auth_year')}
+                  type='text'
+                  value={year}
+                  onChange={handleYearChange}
+                  error={errors.year}
+                />
               </div>
             </div>
           </div>
 
-          {/* Gender Section */}
+          {/* Gender Section - FloatingSelect */}
           <div>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger className='h-[54px] !text-base bg-transparent dark:text-[#E3E3E3] border-gray-300 dark:border-gray-500 focus:border-blue-500 dark:focus:border-[#A8C7FA] focus:ring-0'>
-                <SelectValue placeholder={t('auth_gender')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='male'>{t('auth_male')}</SelectItem>
-                <SelectItem value='female'>{t('auth_female')}</SelectItem>
-                <SelectItem value='other'>{t('auth_other')}</SelectItem>
-                <SelectItem value='prefer-not-to-say'>
-                  {t('auth_prefer_not_to_say')}
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <FloatingSelect
+              label={t('auth_gender')}
+              value={gender}
+              options={genderOptions}
+              onChange={setGender}
+            />
 
             <p className='text-sm md:text-base text-blue-600 dark:text-[#A8C7FA] pt-4'>
               {t('why_we_ask')}
             </p>
 
             <div className='space-y-2 pt-4'>
-              {errors.day && <Error error={errors.day} />}
-              {errors.month && <Error error={errors.month} />}
-              {errors.year && <Error error={errors.year} />}
               {errors.date && <Error error={errors.date} />}
             </div>
           </div>
 
-          {/* Error Messages Section - Always visible above button */}
-
+          {/* Submit Button */}
           <div className='flex flex-col items-end pt-6'>
             {apiError && <Error error={apiError} />}
             <Button

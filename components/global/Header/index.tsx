@@ -69,7 +69,7 @@ export default function Header({ categories }: { categories?: ICategory[] }) {
           <div className='flex space-x-4 w-full justify-end'>
             <Link
               href='/signin'
-              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white hidden md:inline-flex items-center'
+              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white inline-flex items-center'
             >
               {t('signin')}
             </Link>

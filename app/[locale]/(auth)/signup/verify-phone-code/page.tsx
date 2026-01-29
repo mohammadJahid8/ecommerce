@@ -88,7 +88,13 @@ export default function VerifyCodePage() {
         router.push('/signup/review-account');
       } else {
         const data = await response.json();
-        setError(data.message || data.error || t('auth_invalid_code'));
+        // Use translated message for invalid code errors
+        const errorMessage = data.message || data.error;
+        if (errorMessage === 'Invalid code') {
+          setError(t('auth_invalid_code'));
+        } else {
+          setError(errorMessage || t('auth_invalid_code'));
+        }
       }
     } catch (error) {
       console.error('Error:', error);
@@ -118,6 +124,7 @@ export default function VerifyCodePage() {
             value={code}
             onChange={handleCodeChange}
             prefix='N-'
+            error={error}
           />
 
           <div className='flex items-center md:justify-end justify-between gap-10 pt-24'>
@@ -135,16 +142,13 @@ export default function VerifyCodePage() {
                 ? t('auth_resend_code_link')
                 : t('auth_resend_code_timer', { seconds: timeLeft })}
             </button>
-            <div className='flex flex-col items-end'>
-              {error && <Error error={error} />}
-              <Button
-                type='submit'
-                disabled={isLoading || code.length < 6}
-                className='bg-blue-600 hover:bg-blue-700 text-white dark:text-black px-6 h-10 rounded-[20px] dark:bg-[#A8C7FA] disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                {isLoading ? t('auth_loading') : t('auth_next')}
-              </Button>
-            </div>
+            <Button
+              type='submit'
+              disabled={isLoading || code.length < 6}
+              className='bg-blue-600 hover:bg-blue-700 text-white dark:text-black px-6 h-10 rounded-[20px] dark:bg-[#A8C7FA] disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {isLoading ? t('auth_loading') : t('auth_next')}
+            </Button>
           </div>
         </form>
       </div>
