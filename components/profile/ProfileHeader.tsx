@@ -12,6 +12,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ProfileAvatar from './ProfileAvatar';
 
 interface ProfileHeaderProps {
   userInitial?: string;
@@ -29,10 +30,8 @@ export default function ProfileHeader({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const helpRef = useRef<HTMLDivElement>(null);
-  const profileRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 
   // Focus search input when opened
@@ -47,12 +46,6 @@ export default function ProfileHeader({
     const handleClickOutside = (e: MouseEvent) => {
       if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
         setIsHelpOpen(false);
-      }
-      if (
-        profileRef.current &&
-        !profileRef.current.contains(e.target as Node)
-      ) {
-        setIsProfileOpen(false);
       }
     };
 
@@ -175,44 +168,11 @@ export default function ProfileHeader({
           </div>
 
           {/* Profile Avatar */}
-          <div ref={profileRef} className='relative'>
-            <button
-              onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className='ml-2 w-9 h-9 rounded-full bg-rose-500 text-white flex items-center justify-center text-sm font-medium uppercase hover:ring-2 hover:ring-slate-300 dark:hover:ring-slate-600 transition-all'
-              aria-label='Profile'
-            >
-              {userInitial}
-            </button>
-
-            {/* Profile Dropdown */}
-            {isProfileOpen && (
-              <div className='absolute right-0 top-full mt-2 w-80 bg-white dark:bg-[#2d2d2d] rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 overflow-hidden z-50'>
-                <div className='p-4 text-center'>
-                  <div className='w-16 h-16 rounded-full bg-rose-500 text-white flex items-center justify-center text-2xl font-medium uppercase mx-auto mb-3'>
-                    {userInitial}
-                  </div>
-                  <div className='font-medium text-slate-900 dark:text-slate-100'>
-                    {userName}
-                  </div>
-                  <div className='text-sm text-slate-500 dark:text-slate-400'>
-                    {userEmail}
-                  </div>
-                </div>
-
-                <div className='border-t border-slate-200 dark:border-slate-700 p-3'>
-                  <button className='w-full py-2 px-4 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors'>
-                    {t('manage_account') || 'Manage your Google Account'}
-                  </button>
-                </div>
-
-                <div className='border-t border-slate-200 dark:border-slate-700 py-2'>
-                  <button className='w-full flex items-center gap-3 px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left text-sm text-slate-700 dark:text-slate-300'>
-                    {t('sign_out') || 'Sign out'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          <ProfileAvatar
+            userInitial={userInitial}
+            userName={userName}
+            userEmail={userEmail}
+          />
         </div>
       </div>
     </header>

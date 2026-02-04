@@ -12,8 +12,6 @@
 }
 
 .imagesContainer {
-  display: flex;
-  gap: 24px;
   overflow-x: auto;
   scroll-behavior: smooth;
   transition: scroll 0.3s ease-in-out;

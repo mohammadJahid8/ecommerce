@@ -21,12 +21,14 @@ import { API_BASE_URL } from '@/lib/api-config';
 import ProfilePictureDialog from '@/components/profile/profile-picture-dialog';
 import { ThemeToggle } from '@/components/global/ThemeToggle/ThemeToggle';
 import ProfileHeader from '@/components/profile/ProfileHeader';
+import ProfileDrawer from '@/components/profile/ProfileDrawer';
 
 export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState('/image.png');
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -111,17 +113,8 @@ export default function ProfilePage() {
 
   return (
     <>
-      <ProfileHeader
-        userInitial={user?.username?.charAt(0) || user?.email?.charAt(0) || 'J'}
-        userName={user?.username || 'John Doe'}
-        userEmail={user?.email || 'example@gmail.com'}
-        onMenuClick={() => {
-          // TODO: Open navigation drawer
-          console.log('Menu clicked');
-        }}
-      />
       <div className='min-h-screen bg-white dark:bg-[#1f1f1f] text-slate-900 dark:text-slate-100 p-4 md:p-8 font-sans'>
-        <div className='max-w-[850px] mx-auto space-y-4'>
+        <div className='space-y-4'>
           {/* Page Header */}
           <div className='text-center mb-8'>
             <h1 className='text-[28px] font-normal mb-2'>
@@ -257,27 +250,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
-          {/* Footer */}
-          <footer className='mt-12 pt-8 border-t border-slate-200 dark:border-slate-700'>
-            <div className='flex items-center justify-between text-sm text-gray-600 dark:text-[#E3E3E3]'>
-              <div className='flex items-center gap-2'>
-                <LanguageSelector />
-                <ThemeToggle isAuth={true} />
-              </div>
-              <nav className='flex items-center gap-3 md:gap-6 text-xs md:text-sm'>
-                <Link href='#' className='hover:underline'>
-                  {t('footer_help')}
-                </Link>
-                <Link href='#' className='hover:underline'>
-                  {t('footer_privacy')}
-                </Link>
-                <Link href='#' className='hover:underline'>
-                  {t('footer_terms')}
-                </Link>
-              </nav>
-            </div>
-          </footer>
         </div>
       </div>
 

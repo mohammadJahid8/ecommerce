@@ -72,7 +72,7 @@ export default function CreateEmailPage() {
           <FloatingInput
             id='email'
             label={t('profile_email')}
-            type='email'
+            type='text'
             value={email}
             onChange={setEmail}
             error={error}

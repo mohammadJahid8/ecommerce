@@ -7,7 +7,7 @@ import MenuReponsive from './components/MenuReponsive';
 import { ICategory } from '@/utils/interfaces';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
-import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
+import ProfileAvatar from '../../profile/ProfileAvatar';
 
 export default function Header({ categories }: { categories?: ICategory[] }) {
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -66,20 +66,20 @@ export default function Header({ categories }: { categories?: ICategory[] }) {
             </ul>
           </div>
 
-          <div className='flex space-x-4 w-full justify-end'>
+          <div className='flex space-x-4 w-full justify-end items-center'>
             <Link
               href='/signin'
-              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white inline-flex items-center'
+              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white inline-flex items-center hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
             >
               {t('signin')}
             </Link>
             <Link
               href='/signup/username'
-              className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:inline-flex items-center'
+              className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:inline-flex items-center hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
             >
               {t('signup')}
             </Link>
-            <ThemeToggle />
+            <ProfileAvatar />
           </div>
         </div>
       </nav>

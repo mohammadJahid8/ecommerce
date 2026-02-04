@@ -74,7 +74,7 @@ const CusMutiSlider = (props: IProps) => {
 
     sliderRef.current.scrollTo({
       left: scrollTo,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
@@ -102,22 +102,29 @@ const CusMutiSlider = (props: IProps) => {
     <div ref={containerRef} className='relative'>
       {/* Left Arrow */}
       <div
-        className={`absolute z-10 top-[140px] -translate-y-1/2 -left-[80px] hidden md:flex transition-opacity duration-300 ${hideLeftIcon || pHideLeftIcon ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+        className={`absolute z-10 top-[140px] -translate-y-1/2 left-0 md:-left-[40px] xl:-left-[80px] flex transition-opacity duration-300 ${
+          hideLeftIcon || pHideLeftIcon
+            ? 'opacity-0 pointer-events-none'
+            : 'opacity-100'
+        }`}
       >
         <button
-          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[64px] w-[64px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
+          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] md:h-[64px] md:w-[60px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
           onClick={handleScrollLeft}
-          aria-label="Scroll left"
+          aria-label='Scroll left'
         >
-          <ArrowLeft size={28} strokeWidth={2} className='text-[#3c4043] dark:text-white' />
+          <ArrowLeft
+            size={28}
+            strokeWidth={2}
+            className='text-[#3c4043] dark:text-white'
+          />
         </button>
       </div>
 
       {/* Slider Container */}
       <div
         onScroll={updateScrollState}
-        className={styles.imagesContainer}
+        className={`${styles.imagesContainer} grid grid-flow-col xl:gap-6 gap-3 auto-cols-[minmax(280px,1fr)] md:auto-cols-[calc((100%-48px)/3)] lg:auto-cols-[calc((100%-96px)/5)]`}
         ref={sliderRef}
       >
         {props.children}
@@ -125,20 +132,30 @@ const CusMutiSlider = (props: IProps) => {
 
       {/* Right Arrow */}
       <div
-        className={`absolute z-10 top-[140px] -translate-y-1/2 -right-[80px] hidden md:flex transition-opacity duration-300 ${hideRightIcon || pHideRightIcon ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
+        className={`absolute z-10 top-[140px] -translate-y-1/2 right-0 md:-right-[40px] xl:-right-[80px] flex transition-opacity duration-300 ${
+          hideRightIcon || pHideRightIcon
+            ? 'opacity-0 pointer-events-none'
+            : 'opacity-100'
+        }`}
       >
         <button
-          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[64px] w-[64px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
+          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] xl:h-[60px] xl:w-[60px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
           onClick={handleScrollRight}
-          aria-label="Scroll right"
+          aria-label='Scroll right'
         >
-          <ArrowRight size={28} strokeWidth={2} className='text-[#3c4043] dark:text-white' />
+          <ArrowRight
+            size={28}
+            strokeWidth={2}
+            className='text-[#3c4043] dark:text-white'
+          />
         </button>
       </div>
 
       {/* Progress Bar */}
-      <div className='mt-12 mx-auto w-full cursor-pointer group' onClick={handleProgressClick}>
+      <div
+        className='mt-12 mx-auto w-full cursor-pointer group'
+        onClick={handleProgressClick}
+      >
         <div className='relative h-[3px] bg-[#e8eaed] dark:bg-[#3c4043] rounded-full overflow-hidden'>
           <div
             className='absolute h-full bg-[#202124] dark:bg-[#e8eaed] rounded-full transition-all duration-300 ease-out'

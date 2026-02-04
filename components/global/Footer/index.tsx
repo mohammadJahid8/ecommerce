@@ -5,6 +5,8 @@ import IconYoutube from '@/assets/icons/IconYoutube';
 import LanguageMenu from '../Language/Language';
 import { Instagram, Twitter } from 'lucide-react';
 import IconTiktok from '@/assets/icons/IconTiktok';
+import LanguageSelector from '../LanguageSelector';
+import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
 const footerItems1 = [
   'Delivery options',
@@ -72,19 +74,27 @@ const Footer = () => {
       <div className='flex flex-col-reverse md:flex-row justify-between items-center mt-4'>
         {/* Left: Language & Links */}
         <div className='flex flex-wrap justify-center md:justify-start items-center gap-x-6 gap-y-2 mt-4 md:mt-0'>
-          <LanguageMenu />
+          {/* <LanguageMenu /> */}
+          <div className='flex items-center gap-2 text-xs text-[#3c4043]'>
+            <LanguageSelector />
+            <ThemeToggle isAuth={true} />
+          </div>
 
           <div className='flex cursor-pointer'>
             <p className='text-xs text-[#3c4043] font-medium'>Privacy</p>
           </div>
           <div className='flex cursor-pointer'>
-            <p className='text-xs text-[#3c4043] font-medium'>Google Nest Commitment to Privacy</p>
+            <p className='text-xs text-[#3c4043] font-medium'>
+              Google Nest Commitment to Privacy
+            </p>
           </div>
           <div className='flex cursor-pointer'>
             <p className='text-xs text-[#3c4043] font-medium'>Sales Terms</p>
           </div>
           <div className='flex cursor-pointer'>
-            <p className='text-xs text-[#3c4043] font-medium'>Terms of Service</p>
+            <p className='text-xs text-[#3c4043] font-medium'>
+              Terms of Service
+            </p>
           </div>
           <div className='flex cursor-pointer'>
             <p className='text-xs text-[#3c4043] font-medium'>Careers</p>

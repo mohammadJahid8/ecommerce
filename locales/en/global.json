@@ -24,7 +24,7 @@
   "step_2": "Choose the recharge method you prefer and indicate the service provider",
   "step_3": "Follow the on-screen instructions to finish recharging.",
   "step_4": "That's all! You now have your balance ready to use.",
-  "shop_popular_categories": "Top destinations",
+  "shop_popular_categories": "Top Destinations, Success stories, Innovative technology",
   "inspire_with_the_most_popular_routes": "Get inspired by the most popular routes.",
   "see_more": "See more",
   "interactive_your_travel_map": "Interactive, your travel map",
@@ -206,5 +206,14 @@
   "send_feedback": "Send feedback",
   "keyboard_shortcuts": "Keyboard shortcuts",
   "manage_account": "Manage your Google Account",
-  "sign_out": "Sign out"
+  "sign_out": "Sign out",
+  "profile_payment_methods": "Payment methods",
+  "payment_methods_desc": "Add, view, and manage payment methods saved in Google Wallet",
+  "no_payment_methods": "No payment methods yet",
+  "no_payment_methods_desc": "Add a payment method so you can make faster, easier payments",
+  "add_payment_method": "Add payment method",
+  "cardholder_name": "Cardholder name",
+  "card_number": "Card Number",
+  "back": "Back",
+  "add": "Add"
 }

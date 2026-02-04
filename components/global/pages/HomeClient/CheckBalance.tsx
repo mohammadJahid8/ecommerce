@@ -73,6 +73,7 @@ const CheckBalance = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
   const [balance] = useState(45.0);
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
 
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -182,12 +183,22 @@ const CheckBalance = () => {
       setCardError('');
       setExpiryError('');
       setCvcError('');
+      setSelectedAmount(null);
     }, 200);
   };
 
   const handleReload = () => {
     handleClose();
-    router.push(`/${locale}/signin`);
+    // Check if user is logged in
+    const userId =
+      typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (userId) {
+      // User is logged in, navigate to payment methods
+      router.push(`/${locale}/profile/payment-methods`);
+    } else {
+      // Not logged in, redirect to sign in
+      router.push(`/${locale}/signin`);
+    }
   };
 
   const hasAnyError = cardError || expiryError || cvcError;
@@ -195,12 +206,12 @@ const CheckBalance = () => {
 
   return (
     <>
-      <button
+      <Button
         onClick={() => setIsOpen(true)}
-        className='px-3 bg-white text-[#3c4043] border border-[#dadce0] rounded-md w-full lg:w-auto h-10 whitespace-nowrap font-medium text-xs md:text-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
+        className='bg-white text-[#3c4043] border border-[#dadce0] rounded-md w-full lg:w-auto h-10 whitespace-nowrap font-medium text-xs md:text-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
       >
         {t('check_balance')}
-      </button>
+      </Button>
 
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className='sm:max-w-[480px] p-0 gap-0 overflow-hidden'>
@@ -215,18 +226,20 @@ const CheckBalance = () => {
               <div className='mt-8'>
                 {/* Card number label */}
                 <label
-                  className={`text-[13px] font-medium transition-colors ${cardError ? 'text-[#d93025]' : 'text-[#1a73e8]'
-                    }`}
+                  className={`text-[13px] font-medium transition-colors ${
+                    cardError ? 'text-[#d93025]' : 'text-[#1a73e8]'
+                  }`}
                 >
                   Card number
                 </label>
 
                 {/* Input fields row */}
                 <div
-                  className={`flex items-end mt-2 pb-2 border-b-2 transition-colors ${hasAnyError
-                    ? 'border-[#d93025]'
-                    : 'border-[#dadce0] dark:border-gray-600 focus-within:border-[#1a73e8]'
-                    }`}
+                  className={`flex items-end mt-2 pb-2 border-b-2 transition-colors ${
+                    hasAnyError
+                      ? 'border-[#d93025]'
+                      : 'border-[#dadce0] dark:border-gray-600 focus-within:border-[#1a73e8]'
+                  }`}
                 >
                   {/* Card Number */}
                   <input
@@ -258,10 +271,11 @@ const CheckBalance = () => {
                     value={expiry}
                     onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                     placeholder='MM / YY'
-                    className={`w-20 text-base text-center bg-transparent outline-none placeholder:text-[#80868b] ${expiryError
-                      ? 'text-[#d93025]'
-                      : 'text-[#202124] dark:text-white'
-                      }`}
+                    className={`w-20 text-base text-center bg-transparent outline-none placeholder:text-[#80868b] ${
+                      expiryError
+                        ? 'text-[#d93025]'
+                        : 'text-[#202124] dark:text-white'
+                    }`}
                   />
 
                   {/* CVC */}
@@ -274,10 +288,11 @@ const CheckBalance = () => {
                       setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))
                     }
                     placeholder='CVC'
-                    className={`w-12 text-base text-center bg-transparent outline-none placeholder:text-[#80868b] ${cvcError
-                      ? 'text-[#d93025]'
-                      : 'text-[#202124] dark:text-white'
-                      }`}
+                    className={`w-12 text-base text-center bg-transparent outline-none placeholder:text-[#80868b] ${
+                      cvcError
+                        ? 'text-[#d93025]'
+                        : 'text-[#202124] dark:text-white'
+                    }`}
                   />
                 </div>
 
@@ -333,7 +348,12 @@ const CheckBalance = () => {
                   {RELOAD_AMOUNTS.map((amt) => (
                     <button
                       key={amt}
-                      className='py-3 border border-[#dadce0] dark:border-gray-600 rounded-lg text-sm font-medium text-[#3c4043] dark:text-gray-300 hover:border-[#1a73e8] hover:text-[#1a73e8] transition-colors'
+                      onClick={() => setSelectedAmount(amt)}
+                      className={`py-3 border rounded-lg text-sm font-medium transition-colors ${
+                        selectedAmount === amt
+                          ? 'border-[#1a73e8] bg-[#e8f0fe] text-[#1a73e8] dark:bg-blue-900/30 dark:text-blue-300'
+                          : 'border-[#dadce0] dark:border-gray-600 text-[#3c4043] dark:text-gray-300 hover:border-[#1a73e8] hover:text-[#1a73e8]'
+                      }`}
                     >
                       ${amt}
                     </button>

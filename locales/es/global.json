@@ -24,7 +24,7 @@
   "step_2": "Elige el método de recarga que prefieras e indica el proveedor de servicio",
   "step_3": "Sigue las instrucciones en pantalla para finalizar la recarga.",
   "step_4": "¡Eso es todo! Ya tienes tu saldo listo para usar.",
-  "shop_popular_categories": "Compra categorías populares.",
+  "shop_popular_categories": "Destinos populares, Historias de éxito, Tecnología innovadora",
   "inspire_with_the_most_popular_routes": "Inspírate con las rutas más populares.",
   "see_more": "Ver más",
   "interactive_your_travel_map": "Interactivo, tu mapa de viaje",
@@ -206,5 +206,14 @@
   "send_feedback": "Enviar comentarios",
   "keyboard_shortcuts": "Combinaciones de teclas",
   "manage_account": "Gestionar tu Cuenta de Google",
-  "sign_out": "Cerrar sesión"
+  "sign_out": "Cerrar sesión",
+  "profile_payment_methods": "Formas de pago",
+  "payment_methods_desc": "Añade, ve y gestiona los métodos de pago guardados en Google Wallet",
+  "no_payment_methods": "No formas de pago",
+  "no_payment_methods_desc": "Añade un método de pago para hacer compras más rápidas y fáciles",
+  "add_payment_method": "Añadir método de pago",
+  "cardholder_name": "Nombre del titular de la tarjeta",
+  "card_number": "Número de tarjeta",
+  "back": "Atrás",
+  "add": "Agregar"
 }
