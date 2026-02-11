@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
-import { Trash2 } from 'lucide-react';
-import { usePaymentMethods } from '@/hooks/usePaymentMethods';
+import {
+  usePaymentMethods,
+  type PaymentMethod,
+  type PaymentMethodInput,
+} from '@/hooks/usePaymentMethods';
 import AddPaymentMethodDialog from '@/components/profile/AddPaymentMethodDialog';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileDrawer from '@/components/profile/ProfileDrawer';
@@ -24,7 +27,6 @@ const CARD_ICONS: Record<string, string> = {
   placeholder: '/generic.svg',
 };
 
-// Get card display name
 const getCardDisplayName = (cardType: string): string => {
   const names: Record<string, string> = {
     visa: 'Visa',
@@ -46,24 +48,44 @@ export default function PaymentMethodsPage() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { paymentMethods, isLoading, addPaymentMethod, removePaymentMethod } =
-    usePaymentMethods();
+  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(
+    null,
+  );
+  const {
+    paymentMethods,
+    isLoading,
+    addPaymentMethod,
+    updatePaymentMethod,
+    removePaymentMethod,
+  } = usePaymentMethods();
 
-  const handleAddPaymentMethod = (method: {
-    type: 'card' | 'bank';
-    cardType?: string;
-    last4: string;
-    expiry: string;
-    name: string;
-  }) => {
+  const handleAddPaymentMethod = (method: PaymentMethodInput) => {
     addPaymentMethod(method);
+  };
+
+  const handleUpdatePaymentMethod = (
+    id: string,
+    updates: Partial<PaymentMethodInput>,
+  ) => {
+    updatePaymentMethod(id, updates);
+  };
+
+  const handleCardClick = (method: PaymentMethod) => {
+    setEditingMethod(method);
+    setIsDialogOpen(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setTimeout(() => setEditingMethod(null), 200);
+    }
   };
 
   const handleDrawerItemClick = (item: 'personal-info' | 'payment-methods') => {
     if (item === 'personal-info') {
       router.push(`/${locale}/profile`);
     }
-    // Already on payment-methods, do nothing
   };
 
   if (isLoading) {
@@ -92,7 +114,14 @@ export default function PaymentMethodsPage() {
 
   return (
     <>
-      <div className='min-h-screen bg-[#f0f4f9] dark:bg-[#1f1f1f] '>
+      <ProfileDrawer
+        isOpen={isDrawerOpen}
+        onOpenChange={setIsDrawerOpen}
+        activeItem='payment-methods'
+        onItemClick={handleDrawerItemClick}
+      />
+
+      <div className='min-h-screen bg-[#f0f4f9] dark:bg-[#1f1f1f]'>
         <div className='max-w-[850px] mx-auto p-4 md:p-8'>
           {/* Page Header */}
           <h1 className='text-[40px] font-normal text-[#202124] dark:text-white mb-2'>
@@ -106,7 +135,10 @@ export default function PaymentMethodsPage() {
           {/* Add Payment Method Button */}
           {paymentMethods.length !== 0 && (
             <Button
-              onClick={() => setIsDialogOpen(true)}
+              onClick={() => {
+                setEditingMethod(null);
+                setIsDialogOpen(true);
+              }}
               className='bg-[#1c62bd] hover:bg-[#1557b0] text-white font-medium px-6 h-10 rounded-full mb-8 hover:shadow-md'
             >
               {t('add_payment_method') || 'Add payment method'}
@@ -116,7 +148,6 @@ export default function PaymentMethodsPage() {
           {/* Payment Methods List or Empty State */}
           {paymentMethods.length === 0 ? (
             <div className='bg-white dark:bg-[#2d2d2d] rounded-2xl p-12 text-center'>
-              {/* Thumbs Up Illustration */}
               <div className='mx-auto mb-6 relative'>
                 <Image
                   src='/fop_empty.svg'
@@ -135,7 +166,10 @@ export default function PaymentMethodsPage() {
                   'Add a payment method so you can make faster, easier payments'}
               </p>
               <Button
-                onClick={() => setIsDialogOpen(true)}
+                onClick={() => {
+                  setEditingMethod(null);
+                  setIsDialogOpen(true);
+                }}
                 className='bg-[#1c62bd] hover:bg-[#1557b0] text-white font-medium px-6 h-10 rounded-full hover:shadow-md'
               >
                 {t('add_payment_method') || 'Add payment method'}
@@ -144,9 +178,10 @@ export default function PaymentMethodsPage() {
           ) : (
             <div className='bg-white dark:bg-[#2d2d2d] rounded-2xl p-6 space-y-4'>
               {paymentMethods.map((method) => (
-                <div
+                <button
                   key={method.id}
-                  className='flex items-center p-4 bg-[#f8f9fa] dark:bg-[#3c4043] rounded-2xl hover:bg-[#d6d8da]'
+                  onClick={() => handleCardClick(method)}
+                  className='w-full flex items-center p-4 bg-[#f8f9fa] dark:bg-[#3c4043] rounded-2xl hover:bg-[#d6d8da] dark:hover:bg-[#4a4d51] transition-colors cursor-pointer text-left'
                 >
                   {/* Card Icon */}
                   <div className='rounded overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center mr-4'>
@@ -174,16 +209,7 @@ export default function PaymentMethodsPage() {
                       {method.expiry}
                     </div>
                   </div>
-
-                  {/* Delete Button */}
-                  {/* <button
-                    onClick={() => removePaymentMethod(method.id)}
-                    className='p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors opacity-0 group-hover:opacity-100'
-                    aria-label='Remove payment method'
-                  >
-                    <Trash2 className='w-5 h-5' />
-                  </button> */}
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -192,8 +218,10 @@ export default function PaymentMethodsPage() {
 
       <AddPaymentMethodDialog
         isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={handleDialogClose}
         onAdd={handleAddPaymentMethod}
+        onUpdate={handleUpdatePaymentMethod}
+        editingMethod={editingMethod}
       />
     </>
   );

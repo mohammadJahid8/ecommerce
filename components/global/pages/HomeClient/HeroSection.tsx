@@ -32,7 +32,7 @@ const HeroSection: React.FC<CommonProps> = ({ t }) => {
                 {t('hero_description')}
               </p>
               <div className='flex justify-center items-center md:justify-start md:items-start gap-3'>
-                <Button className='bg-[#1967D2] text-white px-3 py-2 font-medium rounded-md sm:px-5 sm:py-2.5 text-xs md:text-sm transition-all duration-300 hover:shadow-[0_4px_10px_rgba(0,0,0,0.3)]'>
+                <Button className='bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 font-medium rounded-md sm:px-5 sm:py-2.5 text-xs md:text-sm transition-all duration-300 '>
                   {t('signup')}
                 </Button>
                 <CheckBalance />

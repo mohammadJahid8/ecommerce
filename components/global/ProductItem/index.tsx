@@ -25,11 +25,11 @@ const ProductItem = (props: ProductItemProps) => {
           </span>
         )}
         <Image
-          className='transition ease-in-out duration-300 group-hover:scale-105 object-contain p-0 w-auto h-auto  max-w-full'
+          className='transition ease-in-out duration-300 group-hover:scale-105 object-contain p-0 w-auto h-auto max-h-[212px] max-w-full'
           unoptimized={true}
           src={popularProduct?.imageUrl}
           width={212}
-          height={212}
+          height={215}
           alt={'image website' + popularProduct?.name}
         />
       </div>

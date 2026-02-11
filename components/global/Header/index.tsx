@@ -69,13 +69,13 @@ export default function Header({ categories }: { categories?: ICategory[] }) {
           <div className='flex space-x-4 w-full justify-end items-center'>
             <Link
               href='/signin'
-              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-gray-700 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white inline-flex items-center hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
+              className='border border-gray-300 rounded px-3 sm:px-6 py-2 text-blue-600 text-xs sm:text-sm font-medium w-fit dark:border-gray-500 dark:text-white inline-flex items-center  hover:bg-gray-100 transition-all duration-300 ease-in-out'
             >
               {t('signin')}
             </Link>
             <Link
               href='/signup/username'
-              className='bg-blue-600 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:inline-flex items-center hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
+              className='bg-blue-600 hover:bg-blue-700 text-white rounded px-3 sm:px-6 py-2 text-xs sm:text-sm font-medium w-fit hidden md:inline-flex items-center  transition-all duration-300 ease-in-out'
             >
               {t('signup')}
             </Link>

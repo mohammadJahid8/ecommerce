@@ -9,8 +9,16 @@ export interface PaymentMethod {
   last4: string;
   expiry: string;
   name: string;
+  // Address fields
+  country: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  postalCode: string;
   createdAt: number;
 }
+
+export type PaymentMethodInput = Omit<PaymentMethod, 'id' | 'createdAt'>;
 
 const STORAGE_KEY = 'payment_methods';
 
@@ -32,7 +40,6 @@ export function usePaymentMethods() {
     }
   }, []);
 
-  // Save to localStorage whenever paymentMethods changes
   const saveToStorage = useCallback((methods: PaymentMethod[]) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(methods));
@@ -42,7 +49,7 @@ export function usePaymentMethods() {
   }, []);
 
   const addPaymentMethod = useCallback(
-    (method: Omit<PaymentMethod, 'id' | 'createdAt'>) => {
+    (method: PaymentMethodInput) => {
       const newMethod: PaymentMethod = {
         ...method,
         id: crypto.randomUUID(),
@@ -54,6 +61,19 @@ export function usePaymentMethods() {
         return updated;
       });
       return newMethod;
+    },
+    [saveToStorage],
+  );
+
+  const updatePaymentMethod = useCallback(
+    (id: string, updates: Partial<PaymentMethodInput>) => {
+      setPaymentMethods((prev) => {
+        const updated = prev.map((m) =>
+          m.id === id ? { ...m, ...updates } : m,
+        );
+        saveToStorage(updated);
+        return updated;
+      });
     },
     [saveToStorage],
   );
@@ -73,6 +93,7 @@ export function usePaymentMethods() {
     paymentMethods,
     isLoading,
     addPaymentMethod,
+    updatePaymentMethod,
     removePaymentMethod,
   };
 }

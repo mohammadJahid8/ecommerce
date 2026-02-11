@@ -33,13 +33,23 @@ export default function ProfileHeader({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const helpRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
-
+  const [isShadow, setShadow] = useState(false);
   // Focus search input when opened
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isSearchOpen]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShadow(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -54,127 +64,134 @@ export default function ProfileHeader({
   }, []);
 
   return (
-    <header className='sticky top-0 z-50 bg-white dark:bg-[#1f1f1f] border-b border-slate-200 dark:border-slate-700'>
-      <div className='flex items-center justify-between h-16 px-4'>
-        {/* Left side - Hamburger menu */}
-        <div className='flex items-center gap-4'>
-          <button
-            onClick={onMenuClick}
-            className='p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors'
-            aria-label='Open menu'
-          >
-            <Menu className='w-6 h-6 text-slate-600 dark:text-slate-300' />
-          </button>
-
-          {/* Logo/Title */}
-          <div className='flex items-center gap-2'>
-            <div className='w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center'>
-              <span className='text-white font-medium text-sm'>G</span>
-            </div>
-            <span className='text-xl text-slate-600 dark:text-slate-300 hidden sm:block'>
-              Account
-            </span>
-          </div>
-        </div>
-
-        {/* Right side - Search, Help, Profile */}
-        <div className='flex items-center gap-1'>
-          {/* Search */}
-          {isSearchOpen ? (
-            <div className='flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 mr-2'>
-              <Search className='w-5 h-5 text-slate-500 dark:text-slate-400 mr-2' />
-              <input
-                ref={searchInputRef}
-                type='text'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('profile_search') || 'Search'}
-                className='bg-transparent border-none outline-none text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 w-48 sm:w-64'
-              />
-              <button
-                onClick={() => {
-                  setIsSearchOpen(false);
-                  setSearchQuery('');
-                }}
-                className='p-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-full ml-2'
-              >
-                <X className='w-4 h-4 text-slate-500 dark:text-slate-400' />
-              </button>
-            </div>
-          ) : (
+    <header className='sticky top-0 z-20'>
+      <nav
+        // className='sticky top-0 z-50 bg-white dark:bg-[#1f1f1f] border-b border-slate-200 dark:border-slate-700'
+        className={`w-full items-center justify-between dark:bg-[#202124] bg-white py-2 text-neutral-600 hover:text-neutral-700 focus:text-neutral-700  ${
+          isShadow ? 'shadow-lg' : ''
+        }`}
+      >
+        <div className='flex items-center justify-between h-16 px-4'>
+          {/* Left side - Hamburger menu */}
+          <div className='flex items-center gap-4'>
             <button
-              onClick={() => setIsSearchOpen(true)}
-              className='p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors'
-              aria-label='Search'
+              onClick={onMenuClick}
+              className='p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors'
+              aria-label='Open menu'
             >
-              <Search className='w-5 h-5 text-slate-600 dark:text-slate-300' />
-            </button>
-          )}
-
-          {/* Help Menu */}
-          <div ref={helpRef} className='relative'>
-            <button
-              onClick={() => setIsHelpOpen(!isHelpOpen)}
-              className={cn(
-                'p-3 rounded-full transition-colors',
-                isHelpOpen
-                  ? 'bg-slate-100 dark:bg-slate-700'
-                  : 'hover:bg-slate-100 dark:hover:bg-slate-700',
-              )}
-              aria-label='Help'
-            >
-              <HelpCircle className='w-5 h-5 text-slate-600 dark:text-slate-300' />
+              <Menu className='w-6 h-6 text-slate-600 dark:text-slate-300' />
             </button>
 
-            {/* Help Dropdown */}
-            {isHelpOpen && (
-              <div className='absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#2d2d2d] rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50'>
-                <div className='px-4 py-3 border-b border-slate-200 dark:border-slate-700'>
-                  <h3 className='font-medium text-slate-900 dark:text-slate-100'>
-                    {t('help_title') || 'Help'}
-                  </h3>
-                </div>
-
-                <div className='py-1'>
-                  <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                    <BookOpen className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                    <div>
-                      <div className='text-sm text-slate-900 dark:text-slate-100'>
-                        {t('help_center') || 'Help'}
-                      </div>
-                    </div>
-                  </button>
-
-                  <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                    <MessageCircle className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                    <div>
-                      <div className='text-sm text-slate-900 dark:text-slate-100'>
-                        {t('send_feedback') || 'Send feedback'}
-                      </div>
-                    </div>
-                  </button>
-
-                  <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                    <Keyboard className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                    <div>
-                      <div className='text-sm text-slate-900 dark:text-slate-100'>
-                        {t('keyboard_shortcuts') || 'Keyboard shortcuts'}
-                      </div>
-                    </div>
-                  </button>
-                </div>
+            {/* Logo/Title */}
+            <div className='flex items-center gap-2'>
+              <div className='w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center'>
+                <span className='text-white font-medium text-sm'>G</span>
               </div>
-            )}
+              <span className='text-xl text-slate-600 dark:text-slate-300 hidden sm:block'>
+                Account
+              </span>
+            </div>
           </div>
 
-          {/* Profile Avatar */}
-          <ProfileAvatar
-            userInitial={userInitial}
-            userName={userName}
-            userEmail={userEmail}
-          />
+          {/* Right side - Search, Help, Profile */}
+          <div className='flex items-center gap-1'>
+            {/* Search */}
+            {isSearchOpen ? (
+              <div className='flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 mr-2'>
+                <Search className='w-5 h-5 text-slate-500 dark:text-slate-400 mr-2' />
+                <input
+                  ref={searchInputRef}
+                  type='text'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('profile_search') || 'Search'}
+                  className='bg-transparent border-none outline-none text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 w-48 sm:w-64'
+                />
+                <button
+                  onClick={() => {
+                    setIsSearchOpen(false);
+                    setSearchQuery('');
+                  }}
+                  className='p-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-full ml-2'
+                >
+                  <X className='w-4 h-4 text-slate-500 dark:text-slate-400' />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className='p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors'
+                aria-label='Search'
+              >
+                <Search className='w-5 h-5 text-slate-600 dark:text-slate-300' />
+              </button>
+            )}
+
+            {/* Help Menu */}
+            <div ref={helpRef} className='relative'>
+              <button
+                onClick={() => setIsHelpOpen(!isHelpOpen)}
+                className={cn(
+                  'p-3 rounded-full transition-colors',
+                  isHelpOpen
+                    ? 'bg-slate-100 dark:bg-slate-700'
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700',
+                )}
+                aria-label='Help'
+              >
+                <HelpCircle className='w-5 h-5 text-slate-600 dark:text-slate-300' />
+              </button>
+
+              {/* Help Dropdown */}
+              {isHelpOpen && (
+                <div className='absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#2d2d2d] rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50'>
+                  <div className='px-4 py-3 border-b border-slate-200 dark:border-slate-700'>
+                    <h3 className='font-medium text-slate-900 dark:text-slate-100'>
+                      {t('help_title') || 'Help'}
+                    </h3>
+                  </div>
+
+                  <div className='py-1'>
+                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
+                      <BookOpen className='w-5 h-5 text-slate-500 dark:text-slate-400' />
+                      <div>
+                        <div className='text-sm text-slate-900 dark:text-slate-100'>
+                          {t('help_center') || 'Help'}
+                        </div>
+                      </div>
+                    </button>
+
+                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
+                      <MessageCircle className='w-5 h-5 text-slate-500 dark:text-slate-400' />
+                      <div>
+                        <div className='text-sm text-slate-900 dark:text-slate-100'>
+                          {t('send_feedback') || 'Send feedback'}
+                        </div>
+                      </div>
+                    </button>
+
+                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
+                      <Keyboard className='w-5 h-5 text-slate-500 dark:text-slate-400' />
+                      <div>
+                        <div className='text-sm text-slate-900 dark:text-slate-100'>
+                          {t('keyboard_shortcuts') || 'Keyboard shortcuts'}
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Profile Avatar */}
+            <ProfileAvatar
+              userInitial={userInitial}
+              userName={userName}
+              userEmail={userEmail}
+            />
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 }

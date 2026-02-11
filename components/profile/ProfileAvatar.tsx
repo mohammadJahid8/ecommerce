@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { API_BASE_URL } from '@/lib/api-config';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 interface ProfileAvatarProps {
   userInitial?: string;
@@ -21,6 +22,7 @@ export default function ProfileAvatar({
   const [loading, setLoading] = useState(!userInitial);
   const profileRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
+  const router = useRouter();
 
   useEffect(() => {
     // If props are provided, don't fetch
@@ -123,7 +125,10 @@ export default function ProfileAvatar({
           </div>
 
           <div className='border-t border-slate-200 dark:border-slate-700 p-3'>
-            <button className='w-full py-2 px-4 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors'>
+            <button
+              onClick={() => router.push('/profile')}
+              className='w-full py-2 px-4 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors'
+            >
               {t('manage_account') || 'Manage your Google Account'}
             </button>
           </div>

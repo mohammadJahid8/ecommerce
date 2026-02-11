@@ -208,7 +208,7 @@ const CheckBalance = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        className='bg-white text-[#3c4043] border border-[#dadce0] rounded-md w-full lg:w-auto h-10 whitespace-nowrap font-medium text-xs md:text-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-[0_1px_2px_rgba(60,64,67,0.3)]'
+        className='bg-white text-blue-600 border border-[#dadce0] rounded-md w-max lg:w-auto h-10 whitespace-nowrap font-medium text-xs md:text-sm transition-all duration-300 hover:bg-gray-100'
       >
         {t('check_balance')}
       </Button>
