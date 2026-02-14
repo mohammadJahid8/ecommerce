@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import ReactCountryFlag from 'react-country-flag';
 import {
   CreditCard,
   Building2,
   ChevronRight,
   MapPin,
   ChevronDown,
+  Pencil,
+  X,
 } from 'lucide-react';
 import {
   Dialog,
@@ -23,19 +26,17 @@ import type {
   PaymentMethodInput,
 } from '@/hooks/usePaymentMethods';
 
-// Card brand icons from public folder
-const CARD_ICONS: Record<string, string> = {
-  visa: '/visa.svg',
-  mastercard: '/mastercard.svg',
-  amex: '/amex.svg',
-  discover: '/discover.svg',
-  diners: '/diners.svg',
-  jcb: '/jcb.svg',
-  unionpay: '/unionpay.svg',
-  placeholder: '/generic.svg',
-};
+/* ─── Card brand config ─── */
+const CARD_BRANDS = [
+  { key: 'visa', src: '/visa.svg' },
+  { key: 'mastercard', src: '/mastercard.svg' },
+  { key: 'amex', src: '/amex.svg' },
+  { key: 'discover', src: '/discover.svg' },
+  { key: 'jcb', src: '/jcb.svg' },
+  { key: 'maestro', src: '/maestro.svg' },
+] as const;
 
-// Luhn algorithm for card validation
+/* ─── Luhn algorithm ─── */
 const isValidLuhn = (number: string): boolean => {
   const digits = number.replace(/\s/g, '');
   if (!/^\d+$/.test(digits)) return false;
@@ -53,7 +54,7 @@ const isValidLuhn = (number: string): boolean => {
   return sum % 10 === 0;
 };
 
-// Card type detection
+/* ─── Card type detection ─── */
 const getCardType = (number: string): string => {
   const n = number.replace(/\s/g, '');
   if (/^4/.test(n)) return 'visa';
@@ -63,6 +64,7 @@ const getCardType = (number: string): string => {
   if (/^3(?:0[0-5]|[68])/.test(n)) return 'diners';
   if (/^35/.test(n)) return 'jcb';
   if (/^62/.test(n)) return 'unionpay';
+  if (/^(?:5018|5020|5038|6304|6759|676[1-3])/.test(n)) return 'maestro';
   return '';
 };
 
@@ -75,36 +77,228 @@ const getCardDisplayName = (cardType: string): string => {
     diners: 'Diners Club',
     jcb: 'JCB',
     unionpay: 'UnionPay',
+    maestro: 'Maestro',
   };
   return names[cardType] || 'Card';
 };
 
+/* ─── Countries ─── */
 const COUNTRIES = [
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'IN', name: 'India', flag: '🇮🇳' },
-  { code: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
-  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
-  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
-  { code: 'CN', name: 'China', flag: '🇨🇳' },
-  { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
-  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
-  { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
-  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
-  { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
-  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
-  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
-  { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
-  { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'FR', name: 'France' },
+  { code: 'IN', name: 'India' },
+  { code: 'BD', name: 'Bangladesh' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'CN', name: 'China' },
+  { code: 'SA', name: 'Saudi Arabia' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'ZA', name: 'South Africa' },
+  { code: 'PK', name: 'Pakistan' },
+  { code: 'PH', name: 'Philippines' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'CO', name: 'Colombia' },
+  { code: 'VE', name: 'Venezuela' },
+  { code: 'TR', name: 'Turkey' },
+  { code: 'RU', name: 'Russia' },
+  { code: 'EG', name: 'Egypt' },
+  { code: 'ID', name: 'Indonesia' },
+  { code: 'TH', name: 'Thailand' },
+  { code: 'VN', name: 'Vietnam' },
+  { code: 'MY', name: 'Malaysia' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'DK', name: 'Denmark' },
+  { code: 'FI', name: 'Finland' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'BE', name: 'Belgium' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'AT', name: 'Austria' },
+  { code: 'PL', name: 'Poland' },
+  { code: 'CZ', name: 'Czech Republic' },
+  { code: 'GR', name: 'Greece' },
+  { code: 'PT', name: 'Portugal' },
+  { code: 'IE', name: 'Ireland' },
+  { code: 'CL', name: 'Chile' },
+  { code: 'PE', name: 'Peru' },
+  { code: 'KE', name: 'Kenya' },
+  { code: 'GH', name: 'Ghana' },
 ];
 
+/* ─── Timezone → Country code mapping ─── */
+const TIMEZONE_TO_COUNTRY: Record<string, string> = {
+  'America/New_York': 'US',
+  'America/Chicago': 'US',
+  'America/Denver': 'US',
+  'America/Los_Angeles': 'US',
+  'America/Phoenix': 'US',
+  'America/Anchorage': 'US',
+  'Pacific/Honolulu': 'US',
+  'America/Toronto': 'CA',
+  'America/Vancouver': 'CA',
+  'America/Edmonton': 'CA',
+  'America/Winnipeg': 'CA',
+  'America/Halifax': 'CA',
+  'Europe/London': 'GB',
+  'Europe/Berlin': 'DE',
+  'Europe/Paris': 'FR',
+  'Europe/Rome': 'IT',
+  'Europe/Madrid': 'ES',
+  'Europe/Amsterdam': 'NL',
+  'Europe/Brussels': 'BE',
+  'Europe/Zurich': 'CH',
+  'Europe/Vienna': 'AT',
+  'Europe/Warsaw': 'PL',
+  'Europe/Prague': 'CZ',
+  'Europe/Athens': 'GR',
+  'Europe/Lisbon': 'PT',
+  'Europe/Dublin': 'IE',
+  'Europe/Stockholm': 'SE',
+  'Europe/Oslo': 'NO',
+  'Europe/Copenhagen': 'DK',
+  'Europe/Helsinki': 'FI',
+  'Europe/Istanbul': 'TR',
+  'Europe/Moscow': 'RU',
+  'Asia/Kolkata': 'IN',
+  'Asia/Calcutta': 'IN',
+  'Asia/Dhaka': 'BD',
+  'Asia/Dacca': 'BD',
+  'Asia/Karachi': 'PK',
+  'Asia/Tokyo': 'JP',
+  'Asia/Seoul': 'KR',
+  'Asia/Shanghai': 'CN',
+  'Asia/Hong_Kong': 'CN',
+  'Asia/Singapore': 'SG',
+  'Asia/Bangkok': 'TH',
+  'Asia/Jakarta': 'ID',
+  'Asia/Ho_Chi_Minh': 'VN',
+  'Asia/Kuala_Lumpur': 'MY',
+  'Asia/Manila': 'PH',
+  'Asia/Riyadh': 'SA',
+  'Asia/Dubai': 'AE',
+  'Australia/Sydney': 'AU',
+  'Australia/Melbourne': 'AU',
+  'Australia/Brisbane': 'AU',
+  'Australia/Perth': 'AU',
+  'Pacific/Auckland': 'NZ',
+  'America/Mexico_City': 'MX',
+  'America/Sao_Paulo': 'BR',
+  'America/Argentina/Buenos_Aires': 'AR',
+  'America/Bogota': 'CO',
+  'America/Caracas': 'VE',
+  'America/Santiago': 'CL',
+  'America/Lima': 'PE',
+  'Africa/Cairo': 'EG',
+  'Africa/Lagos': 'NG',
+  'Africa/Johannesburg': 'ZA',
+  'Africa/Nairobi': 'KE',
+  'Africa/Accra': 'GH',
+};
+
+function detectCountryFromTimezone(): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return TIMEZONE_TO_COUNTRY[tz] || 'US';
+  } catch {
+    return 'US';
+  }
+}
+
+/* ─── Floating Label Input ─── */
+function FloatingField({
+  label,
+  value,
+  onChange,
+  error,
+  type = 'text',
+  inputMode,
+  autoComplete,
+  className,
+  disabled,
+  autoFocus,
+  inputRef,
+  maxLength,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  error?: string;
+  type?: string;
+  inputMode?: 'text' | 'numeric' | 'tel';
+  autoComplete?: string;
+  className?: string;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  inputRef?: React.Ref<HTMLInputElement>;
+  maxLength?: number;
+  placeholder?: string;
+}) {
+  const [focused, setFocused] = useState(false);
+  const isActive = focused || value.length > 0;
+
+  return (
+    <div className={cn('relative', className)}>
+      <div
+        className={cn(
+          'relative border-b-2 transition-colors duration-200',
+          error
+            ? 'border-[#d93025]'
+            : focused
+              ? 'border-[#1a73e8]'
+              : 'border-[#dadce0] dark:border-gray-600',
+        )}
+      >
+        <label
+          className={cn(
+            'absolute left-0 transition-all duration-200 pointer-events-none',
+            isActive ? 'top-0 text-[11px]' : 'top-5 text-[15px]',
+            error
+              ? 'text-[#d93025]'
+              : focused
+                ? 'text-[#1a73e8]'
+                : 'text-[#5f6368] dark:text-gray-400',
+          )}
+        >
+          {label}
+        </label>
+        <input
+          ref={inputRef}
+          type={type}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          disabled={disabled}
+          autoFocus={autoFocus}
+          maxLength={maxLength}
+          placeholder={focused && placeholder ? placeholder : ''}
+          className='w-full pt-5 pb-2 text-[15px] bg-transparent outline-none text-[#202124] dark:text-white placeholder:text-[#80868b]'
+        />
+      </div>
+      {error && (
+        <p className='absolute top-full mt-1 text-[12px] text-[#d93025] whitespace-nowrap'>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main Dialog ─── */
 interface AddPaymentMethodDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -128,16 +322,19 @@ export default function AddPaymentMethodDialog({
 
   // Card form state
   const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
+  const [mm, setMm] = useState('');
+  const [yy, setYy] = useState('');
   const [cvc, setCvc] = useState('');
   const [cardholderName, setCardholderName] = useState('');
+  const [isCardFocused, setIsCardFocused] = useState(false);
 
   // Address state
-  const [country, setCountry] = useState('US');
+  const [country, setCountry] = useState(() => detectCountryFromTimezone());
   const [addressLine1, setAddressLine1] = useState('');
   const [addressLine2, setAddressLine2] = useState('');
   const [city, setCity] = useState('');
   const [postalCode, setPostalCode] = useState('');
+  const [addressExpanded, setAddressExpanded] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
 
   // Bank form state
@@ -155,8 +352,36 @@ export default function AddPaymentMethodDialog({
   const [cityError, setCityError] = useState('');
   const [bankErrors, setBankErrors] = useState<Record<string, string>>({});
 
+  // Scroll state for sticky header
+  const [isScrolled, setIsScrolled] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cardInputRef = useRef<HTMLInputElement>(null);
+  const addressSectionRef = useRef<HTMLDivElement>(null);
+  const countryDropdownRef = useRef<HTMLDivElement>(null);
+
   const cardType = getCardType(cardNumber);
   const cardDigits = cardNumber.replace(/\s/g, '');
+
+  const selectedCountry =
+    COUNTRIES.find((c) => c.code === country) || COUNTRIES[0];
+
+  // Check if required address fields are filled
+  const addressRequiredFilled =
+    addressLine1.trim().length > 0 && city.trim().length > 0;
+
+  // Build address summary text
+  const addressSummary = [addressLine1, addressLine2, city, postalCode]
+    .filter(Boolean)
+    .join(', ');
+
+  // Auto-focus card input when dialog opens on card step
+  useEffect(() => {
+    if (isOpen && step === 'card' && !isEditing) {
+      setTimeout(() => {
+        cardInputRef.current?.focus();
+      }, 300);
+    }
+  }, [isOpen, step, isEditing]);
 
   // Populate form when editing
   useEffect(() => {
@@ -164,16 +389,22 @@ export default function AddPaymentMethodDialog({
       if (editingMethod.type === 'card') {
         setStep('card');
         setCardholderName(editingMethod.name || '');
-        setCountry(editingMethod.country || 'US');
+        setCountry(editingMethod.country || detectCountryFromTimezone());
         setAddressLine1(editingMethod.addressLine1 || '');
         setAddressLine2(editingMethod.addressLine2 || '');
         setCity(editingMethod.city || '');
         setPostalCode(editingMethod.postalCode || '');
-        // Don't populate card number, expiry, cvc for security
+        if (
+          editingMethod.addressLine1 ||
+          editingMethod.city ||
+          editingMethod.postalCode
+        ) {
+          setAddressExpanded(false); // Show summary when pre-filled
+        }
       } else {
         setStep('bank');
         setAccountHolderName(editingMethod.name || '');
-        setCountry(editingMethod.country || 'US');
+        setCountry(editingMethod.country || detectCountryFromTimezone());
         setAddressLine1(editingMethod.addressLine1 || '');
         setAddressLine2(editingMethod.addressLine2 || '');
         setCity(editingMethod.city || '');
@@ -182,34 +413,58 @@ export default function AddPaymentMethodDialog({
     }
   }, [editingMethod, isOpen]);
 
+  // Close address section on outside click — only if required fields are filled
+  useEffect(() => {
+    if (!addressExpanded) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        addressSectionRef.current &&
+        !addressSectionRef.current.contains(e.target as Node) &&
+        addressRequiredFilled
+      ) {
+        setAddressExpanded(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [addressExpanded, addressRequiredFilled]);
+
+  // Close country dropdown on outside click
+  useEffect(() => {
+    if (!isCountryOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        countryDropdownRef.current &&
+        !countryDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsCountryOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [isCountryOpen]);
+
   const formatCard = useCallback((val: string) => {
     const nums = val.replace(/\D/g, '').slice(0, 16);
     return nums.match(/.{1,4}/g)?.join(' ') || '';
   }, []);
 
-  const formatExpiry = useCallback((val: string) => {
-    const nums = val.replace(/\D/g, '').slice(0, 4);
-    if (nums.length >= 2) return `${nums.slice(0, 2)} / ${nums.slice(2)}`;
-    return nums;
-  }, []);
-
   // Real-time card validation
   useEffect(() => {
     if (cardDigits.length === 16 && !isValidLuhn(cardNumber)) {
-      setCardError('Card number is invalid');
+      setCardError(t('card_number_invalid'));
     } else {
       setCardError('');
     }
-  }, [cardNumber, cardDigits]);
+  }, [cardNumber, cardDigits, t]);
 
   // Real-time expiry validation
   useEffect(() => {
-    if (expiry.length === 7) {
-      const parts = expiry.split(' / ');
-      const month = parseInt(parts[0], 10);
-      const year = parseInt(parts[1], 10);
+    if (mm.length === 2 && yy.length === 2) {
+      const month = parseInt(mm, 10);
+      const year = parseInt(yy, 10);
       if (month < 1 || month > 12) {
-        setExpiryError('Invalid month');
+        setExpiryError(t('invalid_month'));
       } else {
         const now = new Date();
         const currentYear = now.getFullYear() % 100;
@@ -218,7 +473,7 @@ export default function AddPaymentMethodDialog({
           year < currentYear ||
           (year === currentYear && month < currentMonth)
         ) {
-          setExpiryError('Card has expired');
+          setExpiryError(t('card_expired'));
         } else {
           setExpiryError('');
         }
@@ -226,15 +481,16 @@ export default function AddPaymentMethodDialog({
     } else {
       setExpiryError('');
     }
-  }, [expiry]);
+  }, [mm, yy, t]);
 
   const resetForm = () => {
     setStep('select');
     setCardNumber('');
-    setExpiry('');
+    setMm('');
+    setYy('');
     setCvc('');
     setCardholderName('');
-    setCountry('US');
+    setCountry(detectCountryFromTimezone());
     setAddressLine1('');
     setAddressLine2('');
     setCity('');
@@ -250,6 +506,9 @@ export default function AddPaymentMethodDialog({
     setAddressError('');
     setCityError('');
     setBankErrors({});
+    setAddressExpanded(false);
+    setIsScrolled(false);
+    setIsCardFocused(false);
     setIsCountryOpen(false);
   };
 
@@ -263,49 +522,47 @@ export default function AddPaymentMethodDialog({
 
     if (!isEditing) {
       if (cardDigits.length === 0) {
-        setCardError('Card number is required');
+        setCardError(t('card_number_required'));
         hasError = true;
       } else if (cardDigits.length !== 16) {
-        setCardError('Enter 16 digits');
+        setCardError(t('enter_16_digits'));
         hasError = true;
       } else if (!isValidLuhn(cardNumber)) {
-        setCardError('Card number is invalid');
+        setCardError(t('card_number_invalid'));
         hasError = true;
       }
-
-      if (expiry.length === 0) {
-        setExpiryError('Required');
+      if (mm.length === 0 || yy.length === 0) {
+        setExpiryError(t('required_field'));
         hasError = true;
-      } else if (expiry.length !== 7) {
-        setExpiryError('Invalid');
+      } else if (mm.length !== 2 || yy.length !== 2) {
+        setExpiryError(t('invalid_field'));
         hasError = true;
       }
-
       if (cvc.length === 0) {
-        setCvcError('Required');
+        setCvcError(t('required_field'));
         hasError = true;
       } else if (cvc.length < 3) {
-        setCvcError('Invalid');
+        setCvcError(t('invalid_field'));
         hasError = true;
       }
     }
 
     if (cardholderName.trim().length === 0) {
-      setNameError('Name is required');
+      setNameError(t('name_required'));
       hasError = true;
     } else {
       setNameError('');
     }
-
     if (addressLine1.trim().length === 0) {
-      setAddressError('Address is required');
+      setAddressError(t('address_required'));
+      setAddressExpanded(true);
       hasError = true;
     } else {
       setAddressError('');
     }
-
     if (city.trim().length === 0) {
-      setCityError('City is required');
+      setCityError(t('city_required'));
+      setAddressExpanded(true);
       hasError = true;
     } else {
       setCityError('');
@@ -316,24 +573,27 @@ export default function AddPaymentMethodDialog({
 
   const validateBank = (): boolean => {
     const errors: Record<string, string> = {};
-
     if (!accountHolderName.trim())
-      errors.accountHolderName = 'Name is required';
-    if (!bankName.trim()) errors.bankName = 'Bank name is required';
+      errors.accountHolderName = t('name_required');
+    if (!bankName.trim()) errors.bankName = t('bank_name_required');
     if (!accountNumber.trim())
-      errors.accountNumber = 'Account number is required';
+      errors.accountNumber = t('account_number_required');
     if (!routingNumber.trim())
-      errors.routingNumber = 'Routing number is required';
-    if (!addressLine1.trim()) errors.addressLine1 = 'Address is required';
-    if (!city.trim()) errors.city = 'City is required';
-
+      errors.routingNumber = t('routing_number_required');
+    if (!addressLine1.trim()) {
+      errors.addressLine1 = t('address_required');
+      setAddressExpanded(true);
+    }
+    if (!city.trim()) {
+      errors.city = t('city_required');
+      setAddressExpanded(true);
+    }
     setBankErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSaveCard = () => {
     if (!validateCard()) return;
-
     if (isEditing && onUpdate && editingMethod) {
       onUpdate(editingMethod.id, {
         name: cardholderName.trim(),
@@ -344,12 +604,11 @@ export default function AddPaymentMethodDialog({
         postalCode: postalCode.trim(),
       });
     } else {
-      const parts = expiry.split(' / ');
       onAdd({
         type: 'card',
         cardType,
         last4: cardDigits.slice(-4),
-        expiry: `${parts[0]}/${parts[1]}`,
+        expiry: `${mm}/${yy}`,
         name: cardholderName.trim() || getCardDisplayName(cardType),
         country,
         addressLine1: addressLine1.trim(),
@@ -363,7 +622,6 @@ export default function AddPaymentMethodDialog({
 
   const handleSaveBank = () => {
     if (!validateBank()) return;
-
     if (isEditing && onUpdate && editingMethod) {
       onUpdate(editingMethod.id, {
         name: accountHolderName.trim(),
@@ -389,163 +647,160 @@ export default function AddPaymentMethodDialog({
     handleClose();
   };
 
-  const hasCardError = cardError || expiryError || cvcError || nameError;
-  const cardIconPath = cardType ? CARD_ICONS[cardType] : CARD_ICONS.placeholder;
-  const selectedCountry =
-    COUNTRIES.find((c) => c.code === country) || COUNTRIES[0];
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      setIsScrolled(scrollRef.current.scrollTop > 0);
+    }
+  };
 
-  // ─── Address fields shared between card and bank ───
-  const renderAddressFields = (errors?: Record<string, string>) => (
-    <div className='space-y-4 mt-6'>
-      {/* Country Selector */}
-      <div className='relative'>
-        <div className='flex items-center gap-3 mb-1'>
-          <MapPin className='w-5 h-5 text-[#5f6368] dark:text-gray-400' />
-          <button
-            type='button'
-            onClick={() => setIsCountryOpen(!isCountryOpen)}
-            className='flex-1 flex items-center justify-between pb-2 border-b border-[#dadce0] dark:border-gray-600 text-left'
-          >
-            <span className='text-base text-[#202124] dark:text-white'>
-              {selectedCountry.flag} {selectedCountry.name} (
-              {selectedCountry.code})
-            </span>
-            <ChevronDown
-              className={cn(
-                'w-5 h-5 text-[#5f6368] transition-transform',
-                isCountryOpen && 'rotate-180',
-              )}
+  /* ─── Country selector (inside expanded address) ─── */
+  const renderCountrySelector = () => (
+    <div className='relative' ref={countryDropdownRef}>
+      <div className='flex items-center gap-3'>
+        <MapPin className='w-5 h-5 text-[#1a73e8] flex-shrink-0' />
+        <button
+          type='button'
+          onClick={() => setIsCountryOpen(!isCountryOpen)}
+          className='flex-1 flex items-center justify-between pb-2 border-b-2 border-[#dadce0] dark:border-gray-600 text-left'
+        >
+          <span className='flex items-center gap-2 text-[15px] text-[#202124] dark:text-white'>
+            <ReactCountryFlag
+              countryCode={country}
+              svg
+              style={{ width: '20px', height: '15px' }}
             />
-          </button>
+            {selectedCountry.name} ({country})
+          </span>
+          <ChevronDown
+            className={cn(
+              'w-5 h-5 text-[#5f6368] transition-transform duration-200',
+              isCountryOpen && 'rotate-180',
+            )}
+          />
+        </button>
+      </div>
+
+      {isCountryOpen && (
+        <div className='absolute z-20 left-8 right-0 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-[#2d2d2d] rounded-lg shadow-lg border border-[#dadce0] dark:border-gray-600'>
+          {COUNTRIES.map((c) => (
+            <button
+              key={c.code}
+              type='button'
+              onClick={() => {
+                setCountry(c.code);
+                setIsCountryOpen(false);
+              }}
+              className={cn(
+                'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2',
+                country === c.code
+                  ? 'bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8]'
+                  : 'text-[#202124] dark:text-white',
+              )}
+            >
+              <ReactCountryFlag
+                countryCode={c.code}
+                svg
+                style={{ width: '18px', height: '13px' }}
+              />
+              {c.name} ({c.code})
+            </button>
+          ))}
         </div>
-
-        {isCountryOpen && (
-          <div className='absolute z-10 left-8 right-0 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-[#2d2d2d] rounded-lg shadow-lg border border-[#dadce0] dark:border-gray-600'>
-            {COUNTRIES.map((c) => (
-              <button
-                key={c.code}
-                type='button'
-                onClick={() => {
-                  setCountry(c.code);
-                  setIsCountryOpen(false);
-                }}
-                className={cn(
-                  'w-full text-left px-4 py-2.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors',
-                  country === c.code
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-[#1a73e8]'
-                    : 'text-[#202124] dark:text-white',
-                )}
-              >
-                {c.flag} {c.name} ({c.code})
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Address Line 1 */}
-      <div>
-        <label
-          className={cn(
-            'text-[13px] font-medium',
-            addressError || errors?.addressLine1
-              ? 'text-[#d93025]'
-              : 'text-[#5f6368] dark:text-gray-400',
-          )}
-        >
-          {t('address_line_1')}
-        </label>
-        <input
-          type='text'
-          value={addressLine1}
-          onChange={(e) => {
-            setAddressLine1(e.target.value);
-            setAddressError('');
-          }}
-          className={cn(
-            'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-            addressError || errors?.addressLine1
-              ? 'border-[#d93025]'
-              : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-          )}
-        />
-        {(addressError || errors?.addressLine1) && (
-          <p className='text-[12px] text-[#d93025] mt-1'>
-            {addressError || errors?.addressLine1}
-          </p>
-        )}
-      </div>
-
-      {/* Address Line 2 */}
-      <div>
-        <label className='text-[13px] font-medium text-[#5f6368] dark:text-gray-400'>
-          {t('address_line_2')}
-        </label>
-        <input
-          type='text'
-          value={addressLine2}
-          onChange={(e) => setAddressLine2(e.target.value)}
-          className='w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8] transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white'
-        />
-      </div>
-
-      {/* City */}
-      <div>
-        <label
-          className={cn(
-            'text-[13px] font-medium',
-            cityError || errors?.city
-              ? 'text-[#d93025]'
-              : 'text-[#5f6368] dark:text-gray-400',
-          )}
-        >
-          {t('city')}
-        </label>
-        <input
-          type='text'
-          value={city}
-          onChange={(e) => {
-            setCity(e.target.value);
-            setCityError('');
-          }}
-          className={cn(
-            'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-            cityError || errors?.city
-              ? 'border-[#d93025]'
-              : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-          )}
-        />
-        {(cityError || errors?.city) && (
-          <p className='text-[12px] text-[#d93025] mt-1'>
-            {cityError || errors?.city}
-          </p>
-        )}
-      </div>
-
-      {/* Postal Code */}
-      <div>
-        <label className='text-[13px] font-medium text-[#5f6368] dark:text-gray-400'>
-          {t('postal_code')}
-        </label>
-        <input
-          type='text'
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-          className='w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8] transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white'
-        />
-      </div>
+      )}
     </div>
   );
 
+  /* ─── Collapsible address section ─── */
+  const renderAddressSection = (errors?: Record<string, string>) => {
+    return (
+      <div ref={addressSectionRef} className='mt-6'>
+        {/* ── COLLAPSED STATE: show summary or default ── */}
+        {!addressExpanded && (
+          <div
+            className='flex items-center gap-3 cursor-pointer group py-2'
+            onClick={() => setAddressExpanded(true)}
+          >
+            <MapPin className='w-5 h-5 text-[#1a73e8] flex-shrink-0' />
+            <div className='flex-1 min-w-0'>
+              {addressSummary ? (
+                <p className='text-[15px] text-[#202124] dark:text-white truncate'>
+                  {addressSummary}
+                </p>
+              ) : (
+                <p className='text-[15px] text-[#5f6368] dark:text-gray-400'>
+                  {t('billing_address')}
+                </p>
+              )}
+            </div>
+            <button
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation();
+                setAddressExpanded(true);
+              }}
+              className='p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0'
+              aria-label='Edit address'
+            >
+              <Pencil className='w-4 h-4 text-[#5f6368] dark:text-gray-400' />
+            </button>
+          </div>
+        )}
+
+        {/* ── EXPANDED STATE: country + address fields ── */}
+        <div
+          className={cn(
+            'overflow-hidden transition-all duration-300 ease-in-out',
+            addressExpanded ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0',
+          )}
+        >
+          {/* Country selector */}
+          {renderCountrySelector()}
+
+          {/* Indented address fields */}
+          <div className='ml-8 mt-4 space-y-5'>
+            <FloatingField
+              label={t('address_line_1')}
+              value={addressLine1}
+              onChange={(v) => {
+                setAddressLine1(v);
+                setAddressError('');
+              }}
+              error={addressError || errors?.addressLine1}
+            />
+            <FloatingField
+              label={t('address_line_2')}
+              value={addressLine2}
+              onChange={setAddressLine2}
+            />
+            <FloatingField
+              label={t('city')}
+              value={city}
+              onChange={(v) => {
+                setCity(v);
+                setCityError('');
+              }}
+              error={cityError || errors?.city}
+            />
+            <FloatingField
+              label={t('postal_code')}
+              value={postalCode}
+              onChange={setPostalCode}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-[520px] p-0 gap-0 overflow-hidden max-h-[90vh] overflow-y-auto'>
+      <DialogContent className='sm:max-w-[520px] p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col'>
         {/* ─── Step 1: Select type ─── */}
         {step === 'select' && (
           <div className='p-6'>
             <DialogHeader>
               <DialogTitle className='text-[22px] font-normal text-[#202124] dark:text-white'>
-                {t('add_payment_method') || 'Add payment method'}
+                {t('add_payment_method')}
               </DialogTitle>
             </DialogHeader>
 
@@ -559,11 +814,10 @@ export default function AddPaymentMethodDialog({
                 </div>
                 <div className='flex-1'>
                   <div className='text-base font-medium text-[#202124] dark:text-white'>
-                    {t('credit_debit_card') || 'Add credit or debit card'}
+                    {t('credit_debit_card')}
                   </div>
                   <div className='text-sm text-[#5f6368] dark:text-gray-400'>
-                    {t('visa_mastercard_amex') ||
-                      'Visa, Mastercard, Amex, and more'}
+                    {t('visa_mastercard_amex')}
                   </div>
                 </div>
                 <ChevronRight className='w-5 h-5 text-gray-400' />
@@ -578,10 +832,10 @@ export default function AddPaymentMethodDialog({
                 </div>
                 <div className='flex-1'>
                   <div className='text-base font-medium text-[#202124] dark:text-white'>
-                    {t('bank_account') || 'Add a bank account'}
+                    {t('bank_account')}
                   </div>
                   <div className='text-sm text-[#5f6368] dark:text-gray-400'>
-                    {t('link_bank_account') || 'Link your bank account'}
+                    {t('link_bank_account')}
                   </div>
                 </div>
                 <ChevronRight className='w-5 h-5 text-gray-400' />
@@ -592,358 +846,329 @@ export default function AddPaymentMethodDialog({
 
         {/* ─── Step 2a: Card form ─── */}
         {step === 'card' && (
-          <div className='p-6'>
-            <DialogHeader>
-              <DialogTitle className='text-[22px] font-normal text-[#202124] dark:text-white'>
-                {isEditing
-                  ? t('edit_payment_method') || 'Edit payment method'
-                  : t('add_payment_method') || 'Add a payment method'}
-              </DialogTitle>
-            </DialogHeader>
+          <>
+            {/* Sticky header */}
+            <div
+              className={cn(
+                'sticky top-0 z-10 px-6 pt-6 pb-4 transition-colors duration-200',
+                isScrolled
+                  ? 'bg-[#f8f9fa] dark:bg-[#2d2d2d] shadow-sm'
+                  : 'bg-white dark:bg-[#1f1f1f]',
+              )}
+            >
+              <DialogHeader className='flex flex-row items-center justify-between'>
+                <DialogTitle className='text-[22px] font-normal text-[#202124] dark:text-white'>
+                  {isEditing
+                    ? t('edit_payment_method')
+                    : t('add_payment_method')}
+                </DialogTitle>
+                <button
+                  onClick={handleClose}
+                  className='rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'
+                >
+                  <X className='w-5 h-5 text-[#5f6368] dark:text-gray-400' />
+                </button>
+              </DialogHeader>
+            </div>
 
-            <div className='mt-6 space-y-4'>
-              {/* Card Number + Expiry + CVC */}
-              {!isEditing && (
-                <div>
-                  <label
-                    className={cn(
-                      'text-[13px] font-medium transition-colors',
-                      cardError
-                        ? 'text-[#d93025]'
-                        : 'text-[#5f6368] dark:text-gray-400',
-                    )}
-                  >
-                    {t('card_number') || 'Card number'}
-                  </label>
-                  <div
-                    className={cn(
-                      'flex items-end mt-2 pb-2 border-b-2 transition-colors',
-                      cardError || expiryError || cvcError
-                        ? 'border-[#d93025]'
-                        : 'border-[#dadce0] dark:border-gray-600 focus-within:border-[#1a73e8]',
-                    )}
-                  >
-                    <input
-                      type='text'
-                      inputMode='numeric'
-                      autoComplete='cc-number'
-                      value={cardNumber}
-                      onChange={(e) =>
-                        setCardNumber(formatCard(e.target.value))
-                      }
-                      placeholder='0000 0000 0000 0000'
-                      className='flex-1 text-base text-[#202124] dark:text-white bg-transparent outline-none placeholder:text-[#80868b]'
-                    />
-                    <div className='flex-shrink-0 mx-2'>
-                      <Image
-                        src={cardIconPath}
-                        alt={cardType || 'card'}
-                        width={32}
-                        height={20}
+            {/* Scrollable body */}
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className='flex-1 overflow-y-auto px-6 pb-6'
+            >
+              <div className='space-y-7'>
+                {!isEditing && (
+                  <div className='flex items-start gap-4'>
+                    {/* Card Number with brand icons */}
+                    <div className='flex-1 min-w-0 relative'>
+                      <div
                         className={cn(
-                          'object-contain',
-                          !cardType && 'grayscale opacity-50',
+                          'relative border-b-2 transition-colors duration-200',
+                          cardError
+                            ? 'border-[#d93025]'
+                            : isCardFocused
+                              ? 'border-[#1a73e8]'
+                              : 'border-[#dadce0] dark:border-gray-600',
                         )}
+                      >
+                        <label
+                          className={cn(
+                            'absolute left-0 transition-all duration-200 pointer-events-none',
+                            isCardFocused || cardNumber
+                              ? 'top-0 text-[11px]'
+                              : 'top-5 text-[15px]',
+                            cardError
+                              ? 'text-[#d93025]'
+                              : isCardFocused
+                                ? 'text-[#1a73e8]'
+                                : 'text-[#5f6368] dark:text-gray-400',
+                          )}
+                        >
+                          {t('card_number')}
+                        </label>
+
+                        <div className='flex items-end pt-5 pb-2'>
+                          <input
+                            ref={cardInputRef}
+                            type='text'
+                            inputMode='numeric'
+                            autoComplete='cc-number'
+                            value={cardNumber}
+                            onChange={(e) =>
+                              setCardNumber(formatCard(e.target.value))
+                            }
+                            onFocus={() => setIsCardFocused(true)}
+                            onBlur={() => setIsCardFocused(false)}
+                            className='flex-1 text-[15px] text-[#202124] dark:text-white bg-transparent outline-none min-w-0'
+                          />
+
+                          {/* Card brand icons */}
+                          <div
+                            className={cn(
+                              'flex items-center gap-1 ml-2 flex-shrink-0 transition-opacity duration-200',
+                              (isCardFocused || cardNumber) &&
+                                (!cardNumber || cardType)
+                                ? 'opacity-100'
+                                : 'opacity-0',
+                            )}
+                          >
+                            {CARD_BRANDS.map((brand) => (
+                              <div
+                                key={brand.key}
+                                className={cn(
+                                  'transition-all duration-300 ease-in-out',
+                                  cardType && cardType !== brand.key
+                                    ? 'max-w-0 opacity-0 mx-0 overflow-hidden'
+                                    : 'max-w-[28px] opacity-100',
+                                )}
+                              >
+                                <Image
+                                  src={brand.src}
+                                  alt={brand.key}
+                                  width={24}
+                                  height={16}
+                                  className='object-contain'
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {cardError && (
+                        <div className='absolute top-full mt-1.5 flex items-start gap-1.5 text-[#d93025]'>
+                          <svg
+                            className='w-4 h-4 mt-0.5 flex-shrink-0'
+                            viewBox='0 0 24 24'
+                            fill='currentColor'
+                          >
+                            <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z' />
+                          </svg>
+                          <span className='text-[12px]'>{cardError}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* MM / YY / CVC — separate floating inputs in same row */}
+                    <div className='w-[60px] flex-shrink-0'>
+                      <FloatingField
+                        label='MM'
+                        value={mm}
+                        onChange={(v) =>
+                          setMm(v.replace(/\D/g, '').slice(0, 2))
+                        }
+                        error={expiryError}
+                        inputMode='numeric'
+                        maxLength={2}
                       />
                     </div>
-                    <input
-                      type='text'
-                      inputMode='numeric'
-                      autoComplete='cc-exp'
-                      value={expiry}
-                      onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                      placeholder='MM / YY'
-                      className={cn(
-                        'w-20 text-base text-center bg-transparent outline-none placeholder:text-[#80868b]',
-                        expiryError
-                          ? 'text-[#d93025]'
-                          : 'text-[#202124] dark:text-white',
-                      )}
-                    />
-                    <input
-                      type='text'
-                      inputMode='numeric'
-                      autoComplete='cc-csc'
-                      value={cvc}
-                      onChange={(e) =>
-                        setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))
-                      }
-                      placeholder='CVC'
-                      className={cn(
-                        'w-12 text-base text-center bg-transparent outline-none placeholder:text-[#80868b]',
-                        cvcError
-                          ? 'text-[#d93025]'
-                          : 'text-[#202124] dark:text-white',
-                      )}
-                    />
-                  </div>
-                  {(cardError || expiryError || cvcError) && (
-                    <div className='mt-2 flex items-start gap-2 text-[#d93025]'>
-                      <svg
-                        className='w-4 h-4 mt-0.5 flex-shrink-0'
-                        viewBox='0 0 24 24'
-                        fill='currentColor'
-                      >
-                        <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z' />
-                      </svg>
-                      <span className='text-[13px]'>
-                        {cardError || expiryError || cvcError}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
 
-              {/* Cardholder Name */}
-              <div>
-                <label
-                  className={cn(
-                    'text-[13px] font-medium transition-colors',
-                    nameError
-                      ? 'text-[#d93025]'
-                      : 'text-[#5f6368] dark:text-gray-400',
-                  )}
-                >
-                  {t('cardholder_name') || 'Cardholder name'}
-                </label>
-                <input
-                  type='text'
+                    <div className='w-[60px] flex-shrink-0'>
+                      <FloatingField
+                        label='YY'
+                        value={yy}
+                        onChange={(v) =>
+                          setYy(v.replace(/\D/g, '').slice(0, 2))
+                        }
+                        error={expiryError}
+                        inputMode='numeric'
+                        maxLength={2}
+                      />
+                    </div>
+
+                    <div className='w-[60px] flex-shrink-0'>
+                      <FloatingField
+                        label={t('cvc')}
+                        value={cvc}
+                        onChange={(v) =>
+                          setCvc(v.replace(/\D/g, '').slice(0, 4))
+                        }
+                        error={cvcError}
+                        inputMode='numeric'
+                        maxLength={4}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Cardholder Name */}
+                <FloatingField
+                  label={t('cardholder_name')}
                   value={cardholderName}
-                  onChange={(e) => {
-                    setCardholderName(e.target.value);
+                  onChange={(v) => {
+                    setCardholderName(v);
                     setNameError('');
                   }}
-                  placeholder='John Doe'
-                  className={cn(
-                    'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-                    nameError
-                      ? 'border-[#d93025]'
-                      : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-                  )}
+                  error={nameError}
                 />
-                {nameError && (
-                  <p className='text-[12px] text-[#d93025] mt-1'>{nameError}</p>
-                )}
+
+                {/* Address Section */}
+                {renderAddressSection()}
+
+                {/* Terms */}
+                <p className='text-[12px] text-[#5f6368] dark:text-gray-400 mt-4 leading-relaxed'>
+                  {t('terms_agreement')}{' '}
+                  <span className='text-[#1a73e8] cursor-pointer hover:underline'>
+                    {t('terms_of_service')}
+                  </span>
+                  . {t('privacy_notice')} {t('privacy_notice_desc')}
+                </p>
               </div>
 
-              {/* Address Fields */}
-              {renderAddressFields()}
-
-              {/* Terms */}
-              <p className='text-[12px] text-[#5f6368] dark:text-gray-400 mt-4 leading-relaxed'>
-                {t('terms_agreement')}{' '}
-                <span className='text-[#1a73e8] cursor-pointer hover:underline'>
-                  {t('terms_of_service')}
-                </span>
-                . {t('privacy_notice')} {t('privacy_notice_desc')}
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className='flex justify-end items-center gap-4 mt-6 pt-4 border-t border-[#dadce0] dark:border-gray-700'>
-              {!isEditing && (
-                <button
-                  onClick={() => setStep('select')}
-                  className='text-[#1a73e8] text-sm font-medium hover:underline'
+              {/* Actions */}
+              <div className='flex justify-end items-center gap-4 mt-6 pt-4 border-t border-[#dadce0] dark:border-gray-700'>
+                {!isEditing && (
+                  <button
+                    onClick={() => setStep('select')}
+                    className='text-[#1a73e8] text-sm font-medium hover:underline'
+                  >
+                    {t('back')}
+                  </button>
+                )}
+                <Button
+                  onClick={handleSaveCard}
+                  className='bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium px-8 h-9 rounded'
                 >
-                  {t('back') || 'Back'}
-                </button>
-              )}
-              <Button
-                onClick={handleSaveCard}
-                className='bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium px-8 h-9 rounded'
-              >
-                {t('save') || 'Save'}
-              </Button>
+                  {t('save')}
+                </Button>
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* ─── Step 2b: Bank form ─── */}
         {step === 'bank' && (
-          <div className='p-6'>
-            <DialogHeader>
-              <DialogTitle className='text-[22px] font-normal text-[#202124] dark:text-white'>
-                {isEditing
-                  ? t('edit_bank_account') || 'Edit bank account'
-                  : t('add_bank_account') || 'Add a bank account'}
-              </DialogTitle>
-            </DialogHeader>
+          <>
+            {/* Sticky header */}
+            <div
+              className={cn(
+                'sticky top-0 z-10 px-6 pt-6 pb-4 transition-colors duration-200',
+                isScrolled
+                  ? 'bg-[#f8f9fa] dark:bg-[#2d2d2d] shadow-sm'
+                  : 'bg-white dark:bg-[#1f1f1f]',
+              )}
+            >
+              <DialogHeader>
+                <DialogTitle className='text-[22px] font-normal text-[#202124] dark:text-white'>
+                  {isEditing ? t('edit_bank_account') : t('add_bank_account')}
+                </DialogTitle>
+              </DialogHeader>
+            </div>
 
-            <div className='mt-6 space-y-4'>
-              {/* Account Holder Name */}
-              <div>
-                <label
-                  className={cn(
-                    'text-[13px] font-medium',
-                    bankErrors.accountHolderName
-                      ? 'text-[#d93025]'
-                      : 'text-[#5f6368] dark:text-gray-400',
-                  )}
-                >
-                  {t('account_holder_name')}
-                </label>
-                <input
-                  type='text'
+            {/* Scrollable body */}
+            <div
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className='flex-1 overflow-y-auto px-6 pb-6'
+            >
+              <div className='space-y-5'>
+                {/* Account Holder Name */}
+                <FloatingField
+                  label={t('account_holder_name')}
                   value={accountHolderName}
-                  onChange={(e) => {
-                    setAccountHolderName(e.target.value);
-                    setBankErrors((p) => ({ ...p, accountHolderName: '' }));
+                  onChange={(v) => {
+                    setAccountHolderName(v);
+                    setBankErrors((p) => ({
+                      ...p,
+                      accountHolderName: '',
+                    }));
                   }}
-                  placeholder='John Doe'
-                  className={cn(
-                    'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-                    bankErrors.accountHolderName
-                      ? 'border-[#d93025]'
-                      : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-                  )}
+                  error={bankErrors.accountHolderName}
                 />
-                {bankErrors.accountHolderName && (
-                  <p className='text-[12px] text-[#d93025] mt-1'>
-                    {bankErrors.accountHolderName}
-                  </p>
-                )}
-              </div>
 
-              {!isEditing && (
-                <>
-                  {/* Bank Name */}
-                  <div>
-                    <label
-                      className={cn(
-                        'text-[13px] font-medium',
-                        bankErrors.bankName
-                          ? 'text-[#d93025]'
-                          : 'text-[#5f6368] dark:text-gray-400',
-                      )}
-                    >
-                      {t('bank_name')}
-                    </label>
-                    <input
-                      type='text'
+                {!isEditing && (
+                  <>
+                    <FloatingField
+                      label={t('bank_name')}
                       value={bankName}
-                      onChange={(e) => {
-                        setBankName(e.target.value);
+                      onChange={(v) => {
+                        setBankName(v);
                         setBankErrors((p) => ({ ...p, bankName: '' }));
                       }}
-                      placeholder='e.g. Bank of America'
-                      className={cn(
-                        'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-                        bankErrors.bankName
-                          ? 'border-[#d93025]'
-                          : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-                      )}
+                      error={bankErrors.bankName}
                     />
-                    {bankErrors.bankName && (
-                      <p className='text-[12px] text-[#d93025] mt-1'>
-                        {bankErrors.bankName}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Account Number */}
-                  <div>
-                    <label
-                      className={cn(
-                        'text-[13px] font-medium',
-                        bankErrors.accountNumber
-                          ? 'text-[#d93025]'
-                          : 'text-[#5f6368] dark:text-gray-400',
-                      )}
-                    >
-                      {t('account_number')}
-                    </label>
-                    <input
-                      type='text'
-                      inputMode='numeric'
+                    <FloatingField
+                      label={t('account_number')}
                       value={accountNumber}
-                      onChange={(e) => {
-                        setAccountNumber(e.target.value.replace(/\D/g, ''));
-                        setBankErrors((p) => ({ ...p, accountNumber: '' }));
+                      onChange={(v) => {
+                        setAccountNumber(v.replace(/\D/g, ''));
+                        setBankErrors((p) => ({
+                          ...p,
+                          accountNumber: '',
+                        }));
                       }}
-                      placeholder='Enter account number'
-                      className={cn(
-                        'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-                        bankErrors.accountNumber
-                          ? 'border-[#d93025]'
-                          : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-                      )}
-                    />
-                    {bankErrors.accountNumber && (
-                      <p className='text-[12px] text-[#d93025] mt-1'>
-                        {bankErrors.accountNumber}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Routing Number */}
-                  <div>
-                    <label
-                      className={cn(
-                        'text-[13px] font-medium',
-                        bankErrors.routingNumber
-                          ? 'text-[#d93025]'
-                          : 'text-[#5f6368] dark:text-gray-400',
-                      )}
-                    >
-                      {t('routing_number')}
-                    </label>
-                    <input
-                      type='text'
                       inputMode='numeric'
-                      value={routingNumber}
-                      onChange={(e) => {
-                        setRoutingNumber(e.target.value.replace(/\D/g, ''));
-                        setBankErrors((p) => ({ ...p, routingNumber: '' }));
-                      }}
-                      placeholder='Enter routing number'
-                      className={cn(
-                        'w-full mt-1 pb-2 text-base bg-transparent outline-none border-b-2 transition-colors placeholder:text-[#80868b] text-[#202124] dark:text-white',
-                        bankErrors.routingNumber
-                          ? 'border-[#d93025]'
-                          : 'border-[#dadce0] dark:border-gray-600 focus:border-[#1a73e8]',
-                      )}
+                      error={bankErrors.accountNumber}
                     />
-                    {bankErrors.routingNumber && (
-                      <p className='text-[12px] text-[#d93025] mt-1'>
-                        {bankErrors.routingNumber}
-                      </p>
-                    )}
-                  </div>
-                </>
-              )}
+                    <FloatingField
+                      label={t('routing_number')}
+                      value={routingNumber}
+                      onChange={(v) => {
+                        setRoutingNumber(v.replace(/\D/g, ''));
+                        setBankErrors((p) => ({
+                          ...p,
+                          routingNumber: '',
+                        }));
+                      }}
+                      inputMode='numeric'
+                      error={bankErrors.routingNumber}
+                    />
+                  </>
+                )}
 
-              {/* Address Fields */}
-              {renderAddressFields(bankErrors)}
+                {/* Address Section */}
+                {renderAddressSection(bankErrors)}
 
-              {/* Terms */}
-              <p className='text-[12px] text-[#5f6368] dark:text-gray-400 mt-4 leading-relaxed'>
-                {t('terms_agreement')}{' '}
-                <span className='text-[#1a73e8] cursor-pointer hover:underline'>
-                  {t('terms_of_service')}
-                </span>
-                . {t('privacy_notice')} {t('privacy_notice_desc')}
-              </p>
-            </div>
+                {/* Terms */}
+                <p className='text-[12px] text-[#5f6368] dark:text-gray-400 mt-4 leading-relaxed'>
+                  {t('terms_agreement')}{' '}
+                  <span className='text-[#1a73e8] cursor-pointer hover:underline'>
+                    {t('terms_of_service')}
+                  </span>
+                  . {t('privacy_notice')} {t('privacy_notice_desc')}
+                </p>
+              </div>
 
-            {/* Actions */}
-            <div className='flex justify-end items-center gap-4 mt-6 pt-4 border-t border-[#dadce0] dark:border-gray-700'>
-              {!isEditing && (
-                <button
-                  onClick={() => setStep('select')}
-                  className='text-[#1a73e8] text-sm font-medium hover:underline'
+              {/* Actions */}
+              <div className='flex justify-end items-center gap-4 mt-6 pt-4 border-t border-[#dadce0] dark:border-gray-700'>
+                {!isEditing && (
+                  <button
+                    onClick={() => setStep('select')}
+                    className='text-[#1a73e8] text-sm font-medium hover:underline'
+                  >
+                    {t('back')}
+                  </button>
+                )}
+                <Button
+                  onClick={handleSaveBank}
+                  className='bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium px-8 h-9 rounded'
                 >
-                  {t('back') || 'Back'}
-                </button>
-              )}
-              <Button
-                onClick={handleSaveBank}
-                className='bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium px-8 h-9 rounded'
-              >
-                {t('save') || 'Save'}
-              </Button>
+                  {t('save')}
+                </Button>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </DialogContent>
     </Dialog>

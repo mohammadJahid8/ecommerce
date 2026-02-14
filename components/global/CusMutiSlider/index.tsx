@@ -109,12 +109,12 @@ const CusMutiSlider = (props: IProps) => {
         }`}
       >
         <button
-          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] md:h-[60px] md:w-[60px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
+          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] md:h-[60px] md:w-[60px] border border-[#dadce0] shadow-md transition-all duration-200 hover:bg-[#F8F9FA] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
           onClick={handleScrollLeft}
           aria-label='Scroll left'
         >
           <ArrowLeft
-            size={28}
+            size={24}
             strokeWidth={2}
             className='text-[#3c4043] dark:text-white'
           />
@@ -139,12 +139,12 @@ const CusMutiSlider = (props: IProps) => {
         }`}
       >
         <button
-          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] xl:h-[60px] xl:w-[60px] border border-[#dadce0] shadow-[0_1px_3px_0_rgba(60,64,67,0.3),0_4px_8px_3px_rgba(60,64,67,0.15)] transition-all duration-200 hover:bg-[#F8F9FA] hover:shadow-[0_2px_3px_0_rgba(60,64,67,0.3),0_6px_10px_4px_rgba(60,64,67,0.15)] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
+          className='p-0 cursor-pointer bg-white flex items-center justify-center rounded-full h-[48px] w-[48px] xl:h-[60px] xl:w-[60px] border border-[#dadce0] shadow-md transition-all duration-200 hover:bg-[#F8F9FA] active:bg-[#F1F3F4] dark:bg-[#202124] dark:text-white dark:border-[#5f6368] dark:hover:bg-[#303134] select-none'
           onClick={handleScrollRight}
           aria-label='Scroll right'
         >
           <ArrowRight
-            size={28}
+            size={24}
             strokeWidth={2}
             className='text-[#3c4043] dark:text-white'
           />

@@ -36,21 +36,21 @@ const ProductItem = (props: ProductItemProps) => {
 
       {/* Product Info */}
       <div className='mt-6 flex flex-col'>
-        <p className='text-[18px] font-bold text-[#202124] truncate dark:text-white leading-snug'>
+        <p className='text-base font-bold text-[#202124] truncate dark:text-white leading-snug'>
           {popularProduct?.name}
         </p>
-        <p className='text-[16px] text-[#202124] dark:text-[#e8eaed] mt-3 font-normal'>
+        <p className='text-base font-medium text-[#202124] dark:text-[#e8eaed] mt-8'>
           {t('from')} ${popularProduct?.price}
         </p>
 
         {/* Buy Button */}
         <div className='flex items-center mt-10 cursor-pointer group/buy'>
-          <span className='text-[16px] font-medium text-[#1a73e8] dark:text-[#8ab4f8] group-hover/buy:underline'>
+          <span className='text-base font-medium text-[#0b57d0] dark:text-[#8ab4f8] group-hover/buy:underline'>
             {t('buy')}
           </span>
           <ChevronRight
-            size={20}
-            className='text-[#1a73e8] dark:text-[#8ab4f8] ml-0.5'
+            size={24}
+            className='text-[#0b57d0] dark:text-[#8ab4f8] ml-0.5'
           />
         </div>
       </div>
