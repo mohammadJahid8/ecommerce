@@ -267,6 +267,12 @@
   "bank_confirm_step_1": "Google should deposit less than USD 0.25 in your bank account within 3 business days",
   "bank_confirm_step_2": "Go to the payment methods page and then enter the exact deposit amount",
   "got_it": "Got it",
+  "payment_method_details": "Payment method details",
+  "edit": "Edit",
+  "add_nickname": "Add a nickname",
+  "remove_payment_method": "Remove payment method",
+  "no_transactions": "No transactions to show",
+  "expires_on": "Expires on",
   "back": "Back",
   "add": "Add"
 }

@@ -267,6 +267,12 @@
   "bank_confirm_step_1": "Google debería depositar menos de USD 0.25 en tu cuenta bancaria en un plazo de 3 días hábiles",
   "bank_confirm_step_2": "Vaya a la página de formas de pago y, a continuación, ingrese el importe exacto del depósito",
   "got_it": "Entendido",
+  "payment_method_details": "Detalles de la forma de pago",
+  "edit": "Editar",
+  "add_nickname": "Agregar un sobrenombre",
+  "remove_payment_method": "Quitar forma de pago",
+  "no_transactions": "No hay transacciones para mostrar",
+  "expires_on": "Vence en",
   "back": "Atrás",
   "add": "Agregar"
 }
