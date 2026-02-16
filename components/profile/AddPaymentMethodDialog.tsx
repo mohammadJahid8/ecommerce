@@ -308,7 +308,7 @@ interface AddPaymentMethodDialogProps {
   editingMethod?: PaymentMethod | null;
 }
 
-type Step = "select" | "card" | "bank";
+type Step = "select" | "card" | "bank" | "bank-confirmation";
 
 export default function AddPaymentMethodDialog({
   isOpen,
@@ -655,6 +655,7 @@ export default function AddPaymentMethodDialog({
         city: city.trim(),
         postalCode: postalCode.trim(),
       });
+      handleClose();
     } else {
       onAdd({
         type: "bank",
@@ -667,8 +668,8 @@ export default function AddPaymentMethodDialog({
         city: city.trim(),
         postalCode: postalCode.trim(),
       });
+      setStep("bank-confirmation");
     }
-    handleClose();
   };
 
   const handleScroll = () => {
@@ -818,7 +819,10 @@ export default function AddPaymentMethodDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[520px] p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col">
+      <DialogContent
+        hideClose
+        className="sm:max-w-[520px] p-0 gap-0 overflow-hidden max-h-[90vh] flex flex-col"
+      >
         {/* ─── Step 1: Select type ─── */}
         {step === "select" && (
           <div className="p-6">
@@ -1538,6 +1542,54 @@ export default function AddPaymentMethodDialog({
               </div>
             </div>
           </>
+        )}
+        {/* ─── Step 3: Bank confirmation ─── */}
+        {step === "bank-confirmation" && (
+          <div className="p-6">
+            <DialogHeader className="flex flex-row items-center justify-between">
+              <DialogTitle className="text-[22px] font-normal text-[#202124] dark:text-white">
+                {t("add_payment_method")}
+              </DialogTitle>
+              <button
+                onClick={handleClose}
+                className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <X className="w-5 h-5 text-[#5f6368] dark:text-gray-400" />
+              </button>
+            </DialogHeader>
+
+            <div className="mt-8 space-y-6">
+              {/* Step 1 */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-[28px] h-[28px] rounded-full bg-[#1a73e8] flex items-center justify-center">
+                  <span className="text-white text-[13px] font-medium">1</span>
+                </div>
+                <p className="text-[15px] text-[#202124] dark:text-white leading-relaxed pt-[3px]">
+                  {t("bank_confirm_step_1")}
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-[28px] h-[28px] rounded-full bg-[#1a73e8] flex items-center justify-center">
+                  <span className="text-white text-[13px] font-medium">2</span>
+                </div>
+                <p className="text-[15px] text-[#202124] dark:text-white leading-relaxed pt-[3px]">
+                  {t("bank_confirm_step_2")}
+                </p>
+              </div>
+            </div>
+
+            {/* Got it button — right-aligned */}
+            <div className="flex justify-end mt-10">
+              <Button
+                onClick={handleClose}
+                className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-medium px-10 h-10 rounded-md text-sm min-w-[140px]"
+              >
+                {t("got_it")}
+              </Button>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>

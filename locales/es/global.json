@@ -264,6 +264,9 @@
   "in_the": "En el",
   "privacy_notice_link": "Aviso de Privacidad",
   "privacy_data_desc": ", se describe cómo se usan tus datos.",
+  "bank_confirm_step_1": "Google debería depositar menos de USD 0.25 en tu cuenta bancaria en un plazo de 3 días hábiles",
+  "bank_confirm_step_2": "Vaya a la página de formas de pago y, a continuación, ingrese el importe exacto del depósito",
+  "got_it": "Entendido",
   "back": "Atrás",
   "add": "Agregar"
 }
