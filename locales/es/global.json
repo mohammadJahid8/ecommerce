@@ -274,5 +274,14 @@
   "no_transactions": "No hay transacciones para mostrar",
   "expires_on": "Vence en",
   "back": "Atrás",
-  "add": "Agregar"
+  "add": "Agregar",
+  "update_payment_method": "Actualizar la forma de pago",
+  "cancel": "Cancelar",
+  "update": "Actualizar",
+  "card_nickname": "Sobrenombre de la tarjeta (opcional)",
+  "bank_nickname": "Sobrenombre de la cuenta (opcional)",
+  "cvc_required": "Se requiere el CVC",
+  "country_region": "País / Región",
+  "address_line_1_label": "Línea 1 de la dirección",
+  "address_line_2_label": "Línea 2 de la dirección"
 }

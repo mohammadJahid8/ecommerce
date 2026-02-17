@@ -274,5 +274,14 @@
   "no_transactions": "No transactions to show",
   "expires_on": "Expires on",
   "back": "Back",
-  "add": "Add"
+  "add": "Add",
+  "update_payment_method": "Update payment method",
+  "cancel": "Cancel",
+  "update": "Update",
+  "card_nickname": "Card nickname (optional)",
+  "bank_nickname": "Account nickname (optional)",
+  "cvc_required": "CVC is required",
+  "country_region": "Country / Region",
+  "address_line_1_label": "Address line 1",
+  "address_line_2_label": "Address line 2"
 }

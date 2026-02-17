@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
 export interface PaymentMethod {
   id: string;
-  type: 'card' | 'bank';
+  type: "card" | "bank";
   cardType?: string; // visa, mastercard, etc.
   last4: string;
   expiry: string;
   name: string;
+  nickname?: string;
   // Address fields
   country: string;
   addressLine1: string;
@@ -18,9 +19,9 @@ export interface PaymentMethod {
   createdAt: number;
 }
 
-export type PaymentMethodInput = Omit<PaymentMethod, 'id' | 'createdAt'>;
+export type PaymentMethodInput = Omit<PaymentMethod, "id" | "createdAt">;
 
-const STORAGE_KEY = 'payment_methods';
+const STORAGE_KEY = "payment_methods";
 
 export function usePaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -34,7 +35,7 @@ export function usePaymentMethods() {
         setPaymentMethods(JSON.parse(stored));
       }
     } catch (error) {
-      console.error('Error loading payment methods:', error);
+      console.error("Error loading payment methods:", error);
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +45,7 @@ export function usePaymentMethods() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(methods));
     } catch (error) {
-      console.error('Error saving payment methods:', error);
+      console.error("Error saving payment methods:", error);
     }
   }, []);
 
