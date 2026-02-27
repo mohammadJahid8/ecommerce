@@ -2,17 +2,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Menu,
-  Search,
-  HelpCircle,
-  X,
-  Keyboard,
-  MessageCircle,
-  BookOpen,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Menu, Search, X } from 'lucide-react';
 import ProfileAvatar from './ProfileAvatar';
+import HelpMenu from './HelpMenu';
 
 interface ProfileHeaderProps {
   userInitial?: string;
@@ -29,11 +21,10 @@ export default function ProfileHeader({
 }: ProfileHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const helpRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
   const [isShadow, setShadow] = useState(false);
+
   // Focus search input when opened
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
@@ -51,22 +42,9 @@ export default function ProfileHeader({
     };
   }, []);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (helpRef.current && !helpRef.current.contains(e.target as Node)) {
-        setIsHelpOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
     <header className='sticky top-0 z-20'>
       <nav
-        // className='sticky top-0 z-50 bg-white dark:bg-[#1f1f1f] border-b border-slate-200 dark:border-slate-700'
         className={`w-full items-center justify-between dark:bg-[#202124] bg-white py-2 text-neutral-600 hover:text-neutral-700 focus:text-neutral-700  ${
           isShadow ? 'shadow-lg' : ''
         }`}
@@ -128,60 +106,7 @@ export default function ProfileHeader({
             )}
 
             {/* Help Menu */}
-            <div ref={helpRef} className='relative'>
-              <button
-                onClick={() => setIsHelpOpen(!isHelpOpen)}
-                className={cn(
-                  'p-3 rounded-full transition-colors',
-                  isHelpOpen
-                    ? 'bg-slate-100 dark:bg-slate-700'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-700',
-                )}
-                aria-label='Help'
-              >
-                <HelpCircle className='w-5 h-5 text-slate-600 dark:text-slate-300' />
-              </button>
-
-              {/* Help Dropdown */}
-              {isHelpOpen && (
-                <div className='absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#2d2d2d] rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-2 z-50'>
-                  <div className='px-4 py-3 border-b border-slate-200 dark:border-slate-700'>
-                    <h3 className='font-medium text-slate-900 dark:text-slate-100'>
-                      {t('help_title') || 'Help'}
-                    </h3>
-                  </div>
-
-                  <div className='py-1'>
-                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                      <BookOpen className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                      <div>
-                        <div className='text-sm text-slate-900 dark:text-slate-100'>
-                          {t('help_center') || 'Help'}
-                        </div>
-                      </div>
-                    </button>
-
-                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                      <MessageCircle className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                      <div>
-                        <div className='text-sm text-slate-900 dark:text-slate-100'>
-                          {t('send_feedback') || 'Send feedback'}
-                        </div>
-                      </div>
-                    </button>
-
-                    <button className='w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-left'>
-                      <Keyboard className='w-5 h-5 text-slate-500 dark:text-slate-400' />
-                      <div>
-                        <div className='text-sm text-slate-900 dark:text-slate-100'>
-                          {t('keyboard_shortcuts') || 'Keyboard shortcuts'}
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <HelpMenu />
 
             {/* Profile Avatar */}
             <ProfileAvatar
